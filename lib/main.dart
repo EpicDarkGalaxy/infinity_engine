@@ -10,14 +10,16 @@ void main() {
   engine.init();
   engine.addObject(
     InfinityObject(
-      id: "s",
-      name: "O",
-      position: Offset(100, 100),
-      color: Colors.red,
-      size: Size(100, 100),
-      shape: BoxShape.rectangle,
+      state: InfinityObjectState(
+        color: Colors.red,
+        id: "h",
+        name: "GameManager",
+        position: Offset(100, 100),
+        size: Size(100, 100),
+        shape: BoxShape.rectangle,
+      ),
       loops: [Game()],
-    ),
+    )..hide(),
   );
   engine.runEngine(HitThemGame());
 }
@@ -32,12 +34,7 @@ class HitThemGame extends StatelessWidget {
       home: Scaffold(
         body: Stack(
           children: [
-            InfinityTick(
-              tick: (dt) {
-                InfinityEngine().loop(dt);
-              },
-              targetFps: InfinityEngine().fps,
-            ),
+            InfinityTick(onLogicTick: (dt) {}, logicFps: 60, renderFps: 60),
             InfinityEngine().canvas,
           ],
         ),

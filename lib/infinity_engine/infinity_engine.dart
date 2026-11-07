@@ -1,71 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:hit_them/infinity_engine/infinity/components/canvas_widget.dart';
 import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
-
 import 'package:hit_them/infinity_engine/infinity/infinity_object.dart';
 
-class InfinityEngine {
+class InfinityEngine extends InfinityLoop {
   static final InfinityEngine _instance = InfinityEngine._internal();
   factory InfinityEngine() => _instance;
   InfinityEngine._internal();
 
-  double fps = 15;
-  // late final DeltaTimeWidget gameTick;
+  /// Does nothing
+  InfinityEngine.init();
 
-  /// The canvas to draw on
-  Widget get canvas => _canvas;
-  late final CanvasWidget _canvas;
+  double fps = 1;
 
-  List<InfinityObject> objects = [];
+  late final CanvasController _canvas;
+  late final CanvasWidget _canvasWidget;
 
-  List<VoidCallback> startCallbacks = [];
-  List<void Function(double)> updateCallbacks = [];
+  /// The canvas widget that renders the game
+  Widget get canvas => _canvasWidget;
 
-  final bool state = true;
+  final List<InfinityObject> _objects = [];
+  List<InfinityObject> get objects => _objects;
+
+  final List<VoidCallback> _startCallbacks = [];
+  final List<void Function(double)> _updateCallbacks = [];
+
+  bool isRunning = true;
 
   void init() {
-    _canvas = CanvasWidget(objects: objects);
-    print("gameTick");
+    _canvas = CanvasController();
+    _canvasWidget = CanvasWidget(controller: _canvas);
+    debugPrint("InfinityEngine Initialized");
   }
 
-  void loop(double time) {
-    debugPrint("Loop");
+  /// Called every frame by InfinityTick before its own tick
+  void loop(double deltaTime) {
+    if (!isRunning) return;
 
-    if (state == false) return;
-    for (InfinityObject object in objects) {
-      debugPrint("Updating object");
-      object.position = Offset(3, 3);
-    }
-    // Run update callbacks
-    debugPrint("Running update callbacks");
-    for (void Function(double) call in updateCallbacks) {
-      call.call(time);
+    // 1. Run individual update callbacks (scripts)
+    for (var call in _updateCallbacks) {
+      call(deltaTime);
     }
   }
 
   void addObject(InfinityObject object) {
-    objects.add(object);
+    _objects.add(object);
     _canvas.addObject(object);
     _addCallbacks(object);
+
+    debugPrint('Added object "${object.state.name}"');
+
+    // If engine is already running, run the new object's start callback immediately
+    if (object.loops != null) {
+      debugPrint('Calling Start for the object "${object.state.name}"');
+      for (var loop in object.loops!) {
+        loop.start();
+      }
+    } else {
+      debugPrint('Object "${object.state.name}" has no loops');
+    }
   }
 
   void _addCallbacks(InfinityObject object) {
     if (object.loops == null) return;
-    debugPrint("Adding callbacks");
     for (InfinityLoop loop in object.loops!) {
-      startCallbacks.add(loop.start);
-    }
-    for (InfinityLoop loop in object.loops!) {
-      updateCallbacks.add(loop.update);
+      if (!isRunning) {
+        // If engine is running, don't start callbacks to the list
+        _startCallbacks.add(loop.start);
+      }
+      _updateCallbacks.add(loop.update);
     }
   }
 
   void runEngine(Widget app) {
-    runApp(app);
-
-    // Run start callbacks
-    for (VoidCallback call in startCallbacks) {
-      call.call();
+    // Run start callbacks for all pre-registered objects
+    for (VoidCallback call in _startCallbacks) {
+      call();
+      // remove the start callback after it's been called once
+      _startCallbacks.remove(call);
     }
+
+    runApp(app);
   }
+
+  @override
+  void update(double dt) {}
+
+  @override
+  void start() {}
 }
