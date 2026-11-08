@@ -3,7 +3,7 @@ import 'package:hit_them/infinity_engine/infinity/components/canvas_widget.dart'
 import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
 import 'package:hit_them/infinity_engine/infinity/infinity_object.dart';
 
-class InfinityEngine extends InfinityLoop {
+class InfinityEngine {
   static final InfinityEngine _instance = InfinityEngine._internal();
   factory InfinityEngine() => _instance;
   InfinityEngine._internal();
@@ -11,9 +11,9 @@ class InfinityEngine extends InfinityLoop {
   /// Does nothing
   InfinityEngine.init();
 
-  double fps = 1;
+  double fps = 60;
 
-  late final CanvasController _canvas;
+  late final CanvasController _canvasController;
   late final CanvasWidget _canvasWidget;
 
   /// The canvas widget that renders the game
@@ -25,18 +25,18 @@ class InfinityEngine extends InfinityLoop {
   final List<VoidCallback> _startCallbacks = [];
   final List<void Function(double)> _updateCallbacks = [];
 
-  bool isRunning = true;
+  bool isRunning = false;
 
   void init() {
-    _canvas = CanvasController();
-    _canvasWidget = CanvasWidget(controller: _canvas);
+    _canvasController = CanvasController();
+
+    _canvasWidget = CanvasWidget(controller: _canvasController);
     debugPrint("InfinityEngine Initialized");
   }
 
-  /// Called every frame by InfinityTick before its own tick
+  /// Called every frame by the InfinityTick
   void loop(double deltaTime) {
     if (!isRunning) return;
-
     // 1. Run individual update callbacks (scripts)
     for (var call in _updateCallbacks) {
       call(deltaTime);
@@ -45,12 +45,16 @@ class InfinityEngine extends InfinityLoop {
 
   void addObject(InfinityObject object) {
     _objects.add(object);
-    _canvas.addObject(object);
+    _canvasController.addObject(object);
     _addCallbacks(object);
 
     debugPrint('Added object "${object.state.name}"');
 
     // If engine is already running, run the new object's start callback immediately
+    if (!isRunning) {
+      debugPrint('Engine is not running');
+      return;
+    }
     if (object.loops != null) {
       debugPrint('Calling Start for the object "${object.state.name}"');
       for (var loop in object.loops!) {
@@ -72,20 +76,10 @@ class InfinityEngine extends InfinityLoop {
     }
   }
 
-  void runEngine(Widget app) {
-    // Run start callbacks for all pre-registered objects
-    for (VoidCallback call in _startCallbacks) {
+  void startEngine() {
+    isRunning = true;
+    for (var call in _startCallbacks) {
       call();
-      // remove the start callback after it's been called once
-      _startCallbacks.remove(call);
     }
-
-    runApp(app);
   }
-
-  @override
-  void update(double dt) {}
-
-  @override
-  void start() {}
 }

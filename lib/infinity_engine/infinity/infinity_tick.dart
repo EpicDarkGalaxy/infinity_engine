@@ -39,6 +39,7 @@ class _InfinityTickState extends State<InfinityTick>
   @override
   void initState() {
     super.initState();
+    debugPrint("InfinityTick initState");
     _targetMicrosecondsPerFrame = (1000000 / widget.targetFps).round();
     _targetRenderMicrosecondsPerFrame = (1000000 / widget.renderFps).round();
 
@@ -57,7 +58,6 @@ class _InfinityTickState extends State<InfinityTick>
           }
 
           final double dt = _targetMicrosecondsPerFrame / 1000000.0;
-          InfinityEngine().loop(dt);
           widget.onLogicTick(dt);
 
           _accumulatedLogicTime -= Duration(
@@ -77,7 +77,7 @@ class _InfinityTickState extends State<InfinityTick>
         while (_accumulatedRenderTime.inMicroseconds >=
             _targetRenderMicrosecondsPerFrame) {
           for (var object in InfinityEngine().objects) {
-            object.state.update();
+            object.update();
           }
 
           _accumulatedRenderTime -= Duration(

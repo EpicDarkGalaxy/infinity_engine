@@ -1,0 +1,37 @@
+import 'package:flutter/services.dart';
+
+class InfinityKeyMap {
+  const InfinityKeyMap();
+  final LogicalKeyboardKey w = LogicalKeyboardKey.keyW;
+  final LogicalKeyboardKey a = LogicalKeyboardKey.keyA;
+  final LogicalKeyboardKey s = LogicalKeyboardKey.keyS;
+  final LogicalKeyboardKey d = LogicalKeyboardKey.keyD;
+  final LogicalKeyboardKey space = LogicalKeyboardKey.space;
+  final LogicalKeyboardKey shift = LogicalKeyboardKey.shiftLeft;
+  final LogicalKeyboardKey shiftRight = LogicalKeyboardKey.shiftRight;
+  final LogicalKeyboardKey control = LogicalKeyboardKey.controlLeft;
+  final LogicalKeyboardKey controlRight = LogicalKeyboardKey.controlRight;
+  final LogicalKeyboardKey alt = LogicalKeyboardKey.altLeft;
+  final LogicalKeyboardKey altRight = LogicalKeyboardKey.altRight;
+  final LogicalKeyboardKey tab = LogicalKeyboardKey.tab;
+  final LogicalKeyboardKey enter = LogicalKeyboardKey.enter;
+  final LogicalKeyboardKey escape = LogicalKeyboardKey.escape;
+  final LogicalKeyboardKey backspace = LogicalKeyboardKey.backspace;
+  final LogicalKeyboardKey delete = LogicalKeyboardKey.delete;
+  final LogicalKeyboardKey arrowUp = LogicalKeyboardKey.arrowUp;
+  final LogicalKeyboardKey arrowDown = LogicalKeyboardKey.arrowDown;
+  final LogicalKeyboardKey arrowLeft = LogicalKeyboardKey.arrowLeft;
+  final LogicalKeyboardKey arrowRight = LogicalKeyboardKey.arrowRight;
+  final LogicalKeyboardKey f1 = LogicalKeyboardKey.f1;
+  final LogicalKeyboardKey f2 = LogicalKeyboardKey.f2;
+  final LogicalKeyboardKey f3 = LogicalKeyboardKey.f3;
+  final LogicalKeyboardKey f4 = LogicalKeyboardKey.f4;
+  final LogicalKeyboardKey f5 = LogicalKeyboardKey.f5;
+  final LogicalKeyboardKey f6 = LogicalKeyboardKey.f6;
+  final LogicalKeyboardKey f7 = LogicalKeyboardKey.f7;
+  final LogicalKeyboardKey f8 = LogicalKeyboardKey.f8;
+  final LogicalKeyboardKey f9 = LogicalKeyboardKey.f9;
+  final LogicalKeyboardKey f10 = LogicalKeyboardKey.f10;
+  final LogicalKeyboardKey f11 = LogicalKeyboardKey.f11;
+  final LogicalKeyboardKey f12 = LogicalKeyboardKey.f12;
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hit_them/infinity_engine/infinity/infinity_math/vector2.dart';
 import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
 
 class InfinityObjectState extends ChangeNotifier {
@@ -9,8 +10,8 @@ class InfinityObjectState extends ChangeNotifier {
   bool hidden = false;
 
   // Position tracking
-  Offset previousPosition;
-  Offset currentPosition;
+  Vector2 previousPosition;
+  Vector2 currentPosition;
 
   // Size tracking
   Size previousSize;
@@ -22,7 +23,7 @@ class InfinityObjectState extends ChangeNotifier {
 
   InfinityObjectState({
     this.id = " f",
-    Offset position = const Offset(0, 0),
+    Vector2 position = Vector2.zero,
     Size size = const Size(100, 100),
     Color color = Colors.red,
     this._shape = BoxShape.rectangle,
@@ -35,13 +36,13 @@ class InfinityObjectState extends ChangeNotifier {
        currentColor = color;
 
   // Interpolated getters for smooth rendering
-  Offset get position => currentPosition;
+  Vector2 get position => currentPosition;
   Size get size => currentSize;
   Color get color => currentColor;
   BoxShape get shape => _shape;
 
   // Setters that automatically cache previous values for smooth transitions
-  set position(Offset newPos) {
+  set position(Vector2 newPos) {
     if (currentPosition != newPos) {
       previousPosition = currentPosition;
       currentPosition = newPos;
@@ -53,7 +54,6 @@ class InfinityObjectState extends ChangeNotifier {
     if (currentSize != newSize) {
       previousSize = currentSize;
       currentSize = newSize;
-      notifyListeners();
     }
   }
 
@@ -61,8 +61,11 @@ class InfinityObjectState extends ChangeNotifier {
     if (currentColor != newColor) {
       previousColor = currentColor;
       currentColor = newColor;
-      notifyListeners();
     }
+  }
+
+  set visible(bool isVisible) {
+    hidden = !isVisible;
   }
 
   void update() {
@@ -74,15 +77,28 @@ class InfinityObject extends StatelessWidget {
   const InfinityObject({super.key, required this.state, this.loops});
 
   final InfinityObjectState state;
-  final List<InfinityLoop>? loops;
+  final List<InfinityLoop>? loops; // Scripts that are attached to this object
 
   // Proxy setter for convenience if updating via object reference
-  set position(Offset newPosition) {
+  set position(Vector2 newPosition) {
     state.position = newPosition;
   }
 
-  void hide() {
-    state.hidden = true;
+  set size(Size newSize) {
+    state.size = newSize;
+  }
+
+  set color(Color newColor) {
+    state.color = newColor;
+  }
+
+  set visible(bool isVisible) {
+    state.visible = isVisible;
+  }
+
+  // Force update, Called by InfinityTick's RenderTick
+  void update() {
+    state.update();
   }
 
   @override
@@ -92,7 +108,7 @@ class InfinityObject extends StatelessWidget {
       listenable: state,
       builder: (context, child) {
         return Transform.translate(
-          offset: state.position,
+          offset: state.position.toOffset,
           child: Container(
             width: state.size.width,
             height: state.size.height,
