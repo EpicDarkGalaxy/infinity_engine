@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:hit_them/infinity_engine/infinity/infinity_input/infinity_key_map.dart';
+import 'package:hit_them/infinity_engine/infinity_input/infinity_key_map.dart';
 
 class InfinityInput {
   static final Set<LogicalKeyboardKey> _pressedKeys = {};

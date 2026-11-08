@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/infinity/components/canvas_widget.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_object.dart';
+import 'package:hit_them/infinity_engine/components/canvas_widget.dart';
+import 'package:hit_them/infinity_engine/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/infinity_object.dart';
 
 class InfinityEngine {
   static final InfinityEngine _instance = InfinityEngine._internal();
@@ -37,6 +37,14 @@ class InfinityEngine {
   /// Called every frame by the InfinityTick
   void loop(double deltaTime) {
     if (!isRunning) return;
+
+    // Apply components to the object
+    for (var object in _objects) {
+      for (var components in object.components) {
+        components.apply(deltaTime);
+      }
+    }
+
     // 1. Run individual update callbacks (scripts)
     for (var call in _updateCallbacks) {
       call(deltaTime);

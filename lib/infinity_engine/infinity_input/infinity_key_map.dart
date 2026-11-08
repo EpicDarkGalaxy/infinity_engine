@@ -6,6 +6,10 @@ class InfinityKeyMap {
   final LogicalKeyboardKey a = LogicalKeyboardKey.keyA;
   final LogicalKeyboardKey s = LogicalKeyboardKey.keyS;
   final LogicalKeyboardKey d = LogicalKeyboardKey.keyD;
+  final LogicalKeyboardKey up = LogicalKeyboardKey.arrowUp;
+  final LogicalKeyboardKey down = LogicalKeyboardKey.arrowDown;
+  final LogicalKeyboardKey left = LogicalKeyboardKey.arrowLeft;
+  final LogicalKeyboardKey right = LogicalKeyboardKey.arrowRight;
   final LogicalKeyboardKey space = LogicalKeyboardKey.space;
   final LogicalKeyboardKey shift = LogicalKeyboardKey.shiftLeft;
   final LogicalKeyboardKey shiftRight = LogicalKeyboardKey.shiftRight;

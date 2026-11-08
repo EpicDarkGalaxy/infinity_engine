@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/infinity_component.dart';
+import 'package:hit_them/infinity_engine/infinity_math/vector2.dart';
+import 'package:hit_them/infinity_engine/infinity_loop.dart';
 
 class InfinityObjectState extends ChangeNotifier {
   final String id;
@@ -74,12 +75,14 @@ class InfinityObjectState extends ChangeNotifier {
 }
 
 class InfinityObject extends StatelessWidget {
-  const InfinityObject({super.key, required this.state, this.loops});
+  InfinityObject({super.key, required this.state, this.loops});
 
   final InfinityObjectState state;
   final List<InfinityLoop>? loops; // Scripts that are attached to this object
+  final List<InfinityComponent> _components = [];
 
-  // Proxy setter for convenience if updating via object reference
+  // Proxy setter for convenience if accessing via object reference
+  // Setters
   set position(Vector2 newPosition) {
     state.position = newPosition;
   }
@@ -94,6 +97,21 @@ class InfinityObject extends StatelessWidget {
 
   set visible(bool isVisible) {
     state.visible = isVisible;
+  }
+
+  // Getters
+  Vector2 get position => state.position;
+  Size get size => state.size;
+  Color get color => state.color;
+  bool get visible => state.hidden;
+  List<InfinityComponent> get components => _components;
+
+  void removeComponent(InfinityComponent component) {
+    _components.remove(component);
+  }
+
+  void addComponent(InfinityComponent component) {
+    _components.add(component);
   }
 
   // Force update, Called by InfinityTick's RenderTick

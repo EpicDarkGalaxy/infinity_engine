@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart' as flutter;
-import 'package:hit_them/infinity_engine/infinity/components/input_listener.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_loop.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_object.dart';
-import 'package:hit_them/infinity_engine/infinity/infinity_tick.dart';
+import 'package:hit_them/infinity_engine/components/input_listener.dart';
+import 'package:hit_them/infinity_engine/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/infinity_object.dart';
+import 'package:hit_them/infinity_engine/infinity_tick.dart';
 import 'package:hit_them/infinity_engine/infinity_engine.dart';
 
 class Singularity extends flutter.StatelessWidget {
