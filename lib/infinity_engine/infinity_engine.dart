@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart' as flutter;
-import 'package:hit_them/infinity_engine/components/render/canvas_widget.dart';
-import 'package:hit_them/infinity_engine/components/render/collider_debug_painter.dart';
-import 'package:hit_them/infinity_engine/components/infinity_input/input_listener.dart';
-import 'package:hit_them/infinity_engine/components/infinity_loop.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
-import 'package:hit_them/infinity_engine/components/infinity_tick.dart';
-import 'package:hit_them/infinity_engine/components/infinity_time.dart';
-import 'package:hit_them/infinity_engine/components/infinity_layer.dart';
-import 'package:hit_them/infinity_engine/infinity_container.dart';
+import 'package:infinity_engine/infinity_engine/components/render/canvas_widget.dart';
+import 'package:infinity_engine/infinity_engine/components/render/collider_debug_painter.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_input/input_listener.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_tick.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_time.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
+import 'package:infinity_engine/infinity_engine/infinity_container.dart';
 
 part 'singularity_part.dart';
 

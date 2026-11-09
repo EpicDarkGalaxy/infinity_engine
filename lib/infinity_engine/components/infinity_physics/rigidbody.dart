@@ -1,6 +1,6 @@
-import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
-import 'package:hit_them/infinity_engine/components/infinity_component.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_component.dart';
 
 /// A RigidBody component that can be attached to an InfinityObject to enable physics simulation.
 /// This component handles forces, acceleration, velocity, and position updates based on the physics simulation.

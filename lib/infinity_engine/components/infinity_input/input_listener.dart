@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/components/infinity_input/infinity_input.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_input/infinity_input.dart';
 
 class InputListener extends StatefulWidget {
   const InputListener({super.key, required this.child});

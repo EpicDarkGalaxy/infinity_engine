@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/components/infinity_component.dart';
-import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/components/infinity_loop.dart';
-import 'package:hit_them/infinity_engine/components/infinity_layer.dart';
-import 'package:hit_them/infinity_engine/infinity_engine.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_component.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
+import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 class InfinityObjectState extends ChangeNotifier {
   final String id;

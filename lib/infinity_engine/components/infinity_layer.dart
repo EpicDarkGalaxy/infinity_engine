@@ -1,4 +1,4 @@
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
 /// Represents a layer in the Infinity Engine, which can be used to group objects and control their rendering order and visibility.
 /// ## Parameters

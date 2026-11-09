@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/components/infinity_layer.dart';
-import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
 /// A full-canvas Flutter UI element rendered on the engine's UI layer.
 class InfinityUi extends InfinityObject {

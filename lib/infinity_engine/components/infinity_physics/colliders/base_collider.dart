@@ -1,6 +1,6 @@
-import 'package:hit_them/infinity_engine/components/infinity_component.dart';
-import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_component.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
 abstract class BaseCollider extends InfinityComponent {
   final InfinityObject object;

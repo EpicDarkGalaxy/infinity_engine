@@ -1,17 +1,40 @@
-# hit_them
+# Infinity Engine
 
-A new Flutter project.
+Infinity Engine is an experimental 2D game engine built with Flutter and Dart.
+The repository is engine-first; **Hit Them** is a sample game used to exercise
+the engine during development, not the main product.
 
-## Getting Started
+## Repository Layout
 
-This project is a starting point for a Flutter application.
+- `lib/infinity_engine/`: engine loop, object container, rendering, input, and
+  physics components.
+- `lib/game/`: Hit Them sample-game logic.
+- `test/`: engine and widget tests.
 
-A few resources to get you started if this is your first Flutter project:
+## Run the Sample Game
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Requires the Flutter SDK.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```sh
+flutter pub get
+flutter run
+```
+
+The current sample lets you move horizontally and jump while enemies fall from
+the top of the screen. Colliding with an enemy increases the score and speeds
+up the next wave.
+
+## Controls
+
+- Left and Right Arrow: move
+- Space: jump
+
+Run the test suite with:
+
+```sh
+flutter test
+```
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).

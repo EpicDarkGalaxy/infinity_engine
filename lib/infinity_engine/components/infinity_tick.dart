@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:hit_them/infinity_engine/infinity_engine.dart';
+import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 class InfinityTick extends StatefulWidget {
   final void Function(double deltaTime) onLogicTick;

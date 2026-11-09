@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "hit_them" "\0"
+            VALUE "FileDescription", "Infinity Engine" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "hit_them" "\0"
+            VALUE "InternalName", "infinity_engine" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "hit_them.exe" "\0"
-            VALUE "ProductName", "hit_them" "\0"
+            VALUE "OriginalFilename", "infinity_engine.exe" "\0"
+            VALUE "ProductName", "Infinity Engine" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

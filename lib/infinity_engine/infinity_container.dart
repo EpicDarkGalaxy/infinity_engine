@@ -1,4 +1,4 @@
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
 /// Owns the objects currently registered with the engine.
 class InfinityContainer {

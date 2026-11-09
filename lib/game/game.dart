@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/components.dart';
-import 'package:hit_them/infinity_engine/infinity_engine.dart';
+import 'package:infinity_engine/infinity_engine/components.dart';
+import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 class Game extends InfinityLoop {
   late final InfinityObject shooter;

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/aabb.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/rigidbody.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/aabb.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/rigidbody.dart';
 
 void main() {
   group('AABBCollisionResolver', () {

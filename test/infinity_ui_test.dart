@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hit_them/infinity_engine/components.dart';
+import 'package:infinity_engine/infinity_engine/components.dart';
 
 void main() {
   testWidgets('renders a child on the UI layer', (tester) async {

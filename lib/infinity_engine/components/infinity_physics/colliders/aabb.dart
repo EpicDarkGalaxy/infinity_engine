@@ -1,6 +1,6 @@
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
-import 'package:hit_them/infinity_engine/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
 
 class AABBCollider extends BaseCollider {
   /// - [object] is the parent object of this collider

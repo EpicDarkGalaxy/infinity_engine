@@ -1,8 +1,8 @@
-import 'package:hit_them/game/game.dart';
+import 'package:infinity_engine/game/game.dart';
 import 'package:flutter/material.dart' as flutter;
-import 'package:hit_them/infinity_engine/components.dart';
-import 'package:hit_them/infinity_engine/singularity.dart';
-import 'package:hit_them/infinity_engine/infinity_engine.dart'
+import 'package:infinity_engine/infinity_engine/components.dart';
+import 'package:infinity_engine/infinity_engine/singularity.dart';
+import 'package:infinity_engine/infinity_engine/infinity_engine.dart'
     show InfinityEngine;
 
 void main() {

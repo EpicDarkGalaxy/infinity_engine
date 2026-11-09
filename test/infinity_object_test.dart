@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hit_them/infinity_engine/components/infinity_layer.dart';
-import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
 void main() {
   group('InfinityObject layer state', () {
