@@ -37,7 +37,16 @@ class Vector2 {
 
   Offset get toOffset => Offset(x, y);
 
+  Size get toSize => Size(x, y);
+
   double distanceTo(Vector2 other) => (this - other).magnitude;
+
+  double dot(Vector2 other) => x * other.x + y * other.y;
+
+  double cross(Vector2 other) => x * other.y - y * other.x;
+
+  Vector2 lerp(Vector2 other, double t) =>
+      Vector2(x + (other.x - x) * t, y + (other.y - y) * t);
 
   Vector2 clamp(Vector2 min, Vector2 max) =>
       Vector2(x.clamp(min.x, max.x), y.clamp(min.y, max.y));

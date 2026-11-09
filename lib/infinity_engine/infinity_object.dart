@@ -15,17 +15,22 @@ class InfinityObjectState extends ChangeNotifier {
   Vector2 currentPosition;
 
   // Size tracking
-  Size previousSize;
-  Size currentSize;
+  Vector2 previousSize;
+  Vector2 currentSize;
 
   // Color tracking
   Color previousColor;
   Color currentColor;
 
+  // Rotation tracking
+  double previousRotation = 0.0;
+  double currentRotation = 0.0;
+
   InfinityObjectState({
     this.id = " f",
     Vector2 position = Vector2.zero,
-    Size size = const Size(100, 100),
+    Vector2 size = const Vector2(100, 100),
+    double rotation = 0.0,
     Color color = Colors.red,
     this._shape = BoxShape.rectangle,
     this.name = "New InfinityObject",
@@ -33,28 +38,37 @@ class InfinityObjectState extends ChangeNotifier {
        currentPosition = position,
        previousSize = size,
        currentSize = size,
+       previousRotation = rotation,
+       currentRotation = rotation,
        previousColor = color,
        currentColor = color;
 
-  // Interpolated getters for smooth rendering
   Vector2 get position => currentPosition;
-  Size get size => currentSize;
+  Vector2 get size => currentSize;
+  double get rotation => currentRotation;
   Color get color => currentColor;
   BoxShape get shape => _shape;
+  bool get visible => !hidden;
 
   // Setters that automatically cache previous values for smooth transitions
   set position(Vector2 newPos) {
     if (currentPosition != newPos) {
       previousPosition = currentPosition;
       currentPosition = newPos;
-      // notifyListeners();
     }
   }
 
-  set size(Size newSize) {
+  set size(Vector2 newSize) {
     if (currentSize != newSize) {
       previousSize = currentSize;
       currentSize = newSize;
+    }
+  }
+
+  set rotation(double newRotation) {
+    if (currentRotation != newRotation) {
+      previousRotation = currentRotation;
+      currentRotation = newRotation;
     }
   }
 
@@ -79,7 +93,7 @@ class InfinityObject extends StatelessWidget {
 
   final InfinityObjectState state;
   final List<InfinityLoop>? loops; // Scripts that are attached to this object
-  final List<InfinityComponent> _components = [];
+  final List<InfinityComponent> _components = []; // Components that are attached to this object (eg. Collision, RigidBody)
 
   // Proxy setter for convenience if accessing via object reference
   // Setters
@@ -87,8 +101,12 @@ class InfinityObject extends StatelessWidget {
     state.position = newPosition;
   }
 
-  set size(Size newSize) {
+  set size(Vector2 newSize) {
     state.size = newSize;
+  }
+
+  set rotation(double newRotation) {
+    state.rotation = newRotation;
   }
 
   set color(Color newColor) {
@@ -101,7 +119,8 @@ class InfinityObject extends StatelessWidget {
 
   // Getters
   Vector2 get position => state.position;
-  Size get size => state.size;
+  Vector2 get size => state.size;
+  double get rotation => state.rotation;
   Color get color => state.color;
   bool get visible => state.hidden;
   List<InfinityComponent> get components => _components;
@@ -112,6 +131,10 @@ class InfinityObject extends StatelessWidget {
 
   void addComponent(InfinityComponent component) {
     _components.add(component);
+  }
+
+  void addComponents(List<InfinityComponent> component) {
+    _components.addAll(component);
   }
 
   // Force update, Called by InfinityTick's RenderTick
@@ -127,10 +150,13 @@ class InfinityObject extends StatelessWidget {
       builder: (context, child) {
         return Transform.translate(
           offset: state.position.toOffset,
-          child: Container(
-            width: state.size.width,
-            height: state.size.height,
-            decoration: BoxDecoration(shape: state.shape, color: state.color),
+          child: Transform.rotate(
+            angle: state.rotation,
+            child: Container(
+              width: state.size.toSize.width,
+              height: state.size.toSize.height,
+              decoration: BoxDecoration(shape: state.shape, color: state.color),
+            ),
           ),
         );
       },

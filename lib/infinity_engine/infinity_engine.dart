@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hit_them/infinity_engine/components/canvas_widget.dart';
 import 'package:hit_them/infinity_engine/infinity_loop.dart';
 import 'package:hit_them/infinity_engine/infinity_object.dart';
+import 'package:hit_them/infinity_engine/infinity_physics/colliders/base_collider.dart';
 
 class InfinityEngine {
   static final InfinityEngine _instance = InfinityEngine._internal();
@@ -12,6 +13,7 @@ class InfinityEngine {
   InfinityEngine.init();
 
   double fps = 60;
+  bool debugMode = false;
 
   late final CanvasController _canvasController;
   late final CanvasWidget _canvasWidget;
@@ -38,28 +40,46 @@ class InfinityEngine {
   void loop(double deltaTime) {
     if (!isRunning) return;
 
-    // Apply components to the object
-    for (var object in _objects) {
-      for (var components in object.components) {
-        components.apply(deltaTime);
-      }
-    }
+    // Apply components
+    applyComponents(deltaTime);
 
-    // 1. Run individual update callbacks (scripts)
+    // Run individual update callbacks (scripts)
     for (var call in _updateCallbacks) {
       call(deltaTime);
     }
   }
 
-  void addObject(InfinityObject object) {
-    _objects.add(object);
-    _canvasController.addObject(object);
-    _addCallbacks(object);
+  /// Apply all component's effect to all objects
+  void applyComponents(double deltaTime) {
+    for (int i = 0; i < _objects.length; i++) {
+      var object = _objects[i];
+      for (var component in object.components) {
+        component.apply(deltaTime);
+
+        if (component is BaseCollider) {
+          // Start from i + 1 to avoid checking pairs twice and skipping self
+          for (int j = i + 1; j < _objects.length; j++) {
+            var other = _objects[j];
+            for (var otherComponent in other.components) {
+              if (otherComponent is BaseCollider) {
+                component.overlaps(otherComponent);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  static void addObject(InfinityObject object) {
+    InfinityEngine()._objects.add(object);
+    InfinityEngine()._canvasController.addObject(object);
+    InfinityEngine()._addCallbacks(object);
 
     debugPrint('Added object "${object.state.name}"');
 
     // If engine is already running, run the new object's start callback immediately
-    if (!isRunning) {
+    if (!InfinityEngine().isRunning) {
       debugPrint('Engine is not running');
       return;
     }
@@ -71,6 +91,11 @@ class InfinityEngine {
     } else {
       debugPrint('Object "${object.state.name}" has no loops');
     }
+  }
+
+  static void removeObject(InfinityObject object) {
+    InfinityEngine()._objects.remove(object);
+    InfinityEngine()._canvasController.removeObject(object);
   }
 
   void _addCallbacks(InfinityObject object) {

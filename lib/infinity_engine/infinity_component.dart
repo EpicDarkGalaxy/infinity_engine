@@ -1,3 +1,4 @@
 abstract class InfinityComponent {
-  void apply(double dt);
+  /// Called every frame by InfinityTick's logic tick
+  void apply(double deltaTime);
 }

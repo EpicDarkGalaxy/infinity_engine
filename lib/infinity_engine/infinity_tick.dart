@@ -51,12 +51,6 @@ class _InfinityTickState extends State<InfinityTick>
 
         while (_accumulatedLogicTime.inMicroseconds >=
             _targetMicrosecondsPerFrame) {
-          for (var object in InfinityEngine().objects) {
-            object.state.previousPosition = object.state.currentPosition;
-            object.state.previousSize = object.state.currentSize;
-            object.state.previousColor = object.state.currentColor;
-          }
-
           final double dt = _targetMicrosecondsPerFrame / 1000000.0;
           widget.onLogicTick(dt);
 
