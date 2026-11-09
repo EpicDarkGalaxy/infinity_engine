@@ -1,6 +1,6 @@
-import 'package:hit_them/infinity_engine/infinity_object.dart';
-import 'package:hit_them/infinity_engine/infinity_physics/colliders/base_collider.dart';
-import 'package:hit_them/infinity_engine/infinity_physics/resolvers/aabb_collision_resolver.dart';
+import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
+import 'package:hit_them/infinity_engine/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
 
 class AABBCollider extends BaseCollider {
   /// - [object] is the parent object of this collider
@@ -16,7 +16,11 @@ class AABBCollider extends BaseCollider {
 
   @override
   void overlaps(BaseCollider other) {
-    // Assuming position is the top-left corner:
+    if (object.layer.zIndex != other.object.layer.zIndex) {
+      return; // Only check collisions within the same layer
+    }
+
+    // Check if the other collider is an AABBCollider
     final bool isCollidingX =
         position.x < other.position.x + other.size!.x &&
         position.x + size!.x > other.position.x;
@@ -25,8 +29,11 @@ class AABBCollider extends BaseCollider {
         position.y < other.position.y + other.size!.y &&
         position.y + size!.y > other.position.y;
 
-    if (isCollidingX && isCollidingY) {
-      // 1. Automatically resolve position and velocity
+    final bool isColliding = (isCollidingX && isCollidingY);
+
+    object.isColliding = isColliding;
+    if (isColliding) {
+      // Automatically resolve position and velocity
       AABBCollisionResolver.resolve(
         object,
         other.object,
@@ -39,7 +46,5 @@ class AABBCollider extends BaseCollider {
   }
 
   @override
-  void apply(double dt) {
-    // Update position from the object each frame if needed
-  }
+  void apply(double dt) {}
 }

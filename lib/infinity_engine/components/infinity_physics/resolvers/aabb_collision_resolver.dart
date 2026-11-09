@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:hit_them/infinity_engine/infinity_object.dart';
-import 'package:hit_them/infinity_engine/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/infinity_physics/colliders/base_collider.dart';
-import 'package:hit_them/infinity_engine/infinity_physics/rigidbody.dart';
+import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
+import 'package:hit_them/infinity_engine/components/infinity_physics/rigidbody.dart';
 
 class AABBCollisionResolver {
   /// Resolves AABB collision between two objects, correcting positions and bouncing velocities.

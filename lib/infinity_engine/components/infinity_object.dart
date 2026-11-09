@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hit_them/infinity_engine/infinity_component.dart';
-import 'package:hit_them/infinity_engine/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/components/infinity_component.dart';
+import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:hit_them/infinity_engine/components/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/components/infinity_layer.dart';
+import 'package:hit_them/infinity_engine/infinity_engine.dart';
 
 class InfinityObjectState extends ChangeNotifier {
   final String id;
   final String name;
   final BoxShape _shape;
 
-  bool hidden = false;
+  InfinityLayer _layer;
+
+  bool _hidden = false;
+  bool isColliding = false;
 
   // Position tracking
   Vector2 previousPosition;
@@ -32,9 +37,11 @@ class InfinityObjectState extends ChangeNotifier {
     Vector2 size = const Vector2(100, 100),
     double rotation = 0.0,
     Color color = Colors.red,
+    InfinityLayer? layer,
     this._shape = BoxShape.rectangle,
     this.name = "New InfinityObject",
-  }) : previousPosition = position,
+  }) : _layer = layer ?? InfinityLayer.defaultLayer,
+       previousPosition = position,
        currentPosition = position,
        previousSize = size,
        currentSize = size,
@@ -47,8 +54,9 @@ class InfinityObjectState extends ChangeNotifier {
   Vector2 get size => currentSize;
   double get rotation => currentRotation;
   Color get color => currentColor;
+  InfinityLayer get layer => _layer;
   BoxShape get shape => _shape;
-  bool get visible => !hidden;
+  bool get isVisible => !_hidden;
 
   // Setters that automatically cache previous values for smooth transitions
   set position(Vector2 newPos) {
@@ -79,8 +87,18 @@ class InfinityObjectState extends ChangeNotifier {
     }
   }
 
-  set visible(bool isVisible) {
-    hidden = !isVisible;
+  set layer(InfinityLayer newLayer) {
+    if (!identical(_layer, newLayer)) {
+      _layer = newLayer;
+      notifyListeners();
+    }
+  }
+
+  set isVisible(bool isVisible) {
+    _hidden = !isVisible;
+    if (_hidden) {
+      debugPrint('Object "$name" is hidden');
+    }
   }
 
   void update() {
@@ -95,7 +113,7 @@ class InfinityObject extends StatelessWidget {
   final List<InfinityLoop>? loops; // Scripts that are attached to this object
   final List<InfinityComponent> _components = []; // Components that are attached to this object (eg. Collision, RigidBody)
 
-  // Proxy setter for convenience if accessing via object reference
+  // Proxy setter and getters for convenience if accessing via object reference
   // Setters
   set position(Vector2 newPosition) {
     state.position = newPosition;
@@ -113,8 +131,16 @@ class InfinityObject extends StatelessWidget {
     state.color = newColor;
   }
 
-  set visible(bool isVisible) {
-    state.visible = isVisible;
+  set isVisible(bool isVisible) {
+    state.isVisible = isVisible;
+  }
+
+  set isColliding(bool isColliding) {
+    state.isColliding = isColliding;
+  }
+
+  set layer(InfinityLayer newLayer) {
+    InfinityEngine.setObjectLayer(this, newLayer);
   }
 
   // Getters
@@ -122,7 +148,9 @@ class InfinityObject extends StatelessWidget {
   Vector2 get size => state.size;
   double get rotation => state.rotation;
   Color get color => state.color;
-  bool get visible => state.hidden;
+  InfinityLayer get layer => state.layer;
+  bool get isVisible => state.isVisible;
+  bool get isColliding => state.isColliding;
   List<InfinityComponent> get components => _components;
 
   void removeComponent(InfinityComponent component) {
@@ -139,12 +167,13 @@ class InfinityObject extends StatelessWidget {
 
   // Force update, Called by InfinityTick's RenderTick
   void update() {
+    if (!state.isVisible) return; // If object is not visible, don't update
     state.update();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (state.hidden) return const SizedBox.shrink();
+    if (!state.isVisible) return const SizedBox.shrink();
     return ListenableBuilder(
       listenable: state,
       builder: (context, child) {

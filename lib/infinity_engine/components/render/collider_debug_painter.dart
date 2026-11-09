@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hit_them/infinity_engine/infinity_engine.dart';
-import 'package:hit_them/infinity_engine/infinity_physics/colliders/base_collider.dart';
+import 'package:hit_them/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
 
 class ColliderDebugPainter extends CustomPainter {
   final InfinityEngine engine;

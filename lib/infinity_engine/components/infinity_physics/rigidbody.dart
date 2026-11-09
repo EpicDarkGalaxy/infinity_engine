@@ -1,7 +1,16 @@
-import 'package:hit_them/infinity_engine/infinity_math/vector2.dart';
-import 'package:hit_them/infinity_engine/infinity_object.dart';
-import 'package:hit_them/infinity_engine/infinity_component.dart';
+import 'package:hit_them/infinity_engine/components/infinity_math/vector2.dart';
+import 'package:hit_them/infinity_engine/components/infinity_object.dart';
+import 'package:hit_them/infinity_engine/components/infinity_component.dart';
 
+/// A RigidBody component that can be attached to an InfinityObject to enable physics simulation.
+/// This component handles forces, acceleration, velocity, and position updates based on the physics simulation.
+/// ## Parameters
+/// - [object] is the parent InfinityObject to which this RigidBody is attached.
+/// - [mass] is the mass of the object. A mass of 0 or if [isStatic] is true will make the object immovable.
+/// - [drag] is the drag coefficient that slows down the object over time.
+/// - [isStatic] determines if the object is static (immovable) or dynamic (movable).
+/// - [manualTrigger] if true, the physics simulation will not automatically update the object's position and velocity; you must call [applyForce] manually.
+/// - [useGravity] if true, the object will be affected by gravity.
 class RigidBody extends InfinityComponent {
   RigidBody({
     required this.object,
@@ -32,6 +41,17 @@ class RigidBody extends InfinityComponent {
   /// Adds a force to the rigid body.
   void addForce(Vector2 force) {
     _forceAccumulator = _forceAccumulator + force;
+  }
+
+  /// Applies an impulse to the rigid body.
+  void addImpulse(Vector2 impulse) {
+    velocity = velocity + impulse * invMass;
+  }
+
+  /// Applies an acceleration to the rigid body.
+  void applyAcceleration(Vector2 acceleration) {
+    velocity = velocity + acceleration;
+    velocity = velocity * (1.0 - (drag * invMass));
   }
 
   /// Applies accumulated forces, gravity, and integrates motion.

@@ -1,4 +1,4 @@
-import 'package:hit_them/infinity_engine/infinity_loop.dart';
+import 'package:hit_them/infinity_engine/components/infinity_loop.dart';
 
 class InfinityTime extends InfinityLoop {
   static double get deltaTime => _deltaTime;
