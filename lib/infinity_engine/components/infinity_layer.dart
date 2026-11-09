@@ -108,6 +108,12 @@ class InfinityLayer {
     return layers.where((layer) => layer.isCollidable == isCollidable).toList();
   }
 
+  /// Represents a layer in the Infinity Engine, which can be used to group objects and control their rendering order and visibility.
+  /// ## Parameters
+  /// - [name] is the name of the layer.
+  /// - [zIndex] determines the rendering order of the layer. Higher zIndex layers are rendered on top of lower zIndex layers.
+  /// - [isVisible] determines if the layer is visible. If false, objects in this layer will not be rendered.
+  /// - [isCollidable] determines if objects in this layer can collide with objects in other layers. If false, collision checks will be
   InfinityLayer({
     required this.name,
     required this.zIndex,

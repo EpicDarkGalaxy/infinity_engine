@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/components/render/canvas_widget.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
-import 'package:infinity_engine/infinity_engine/singularity.dart';
 
 void main() {
   testWidgets('renders the scene canvas with debug mode disabled', (

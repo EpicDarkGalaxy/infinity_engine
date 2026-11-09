@@ -51,6 +51,7 @@ void runApp(Singularity gameWidget) {
   InfinityEngine().startEngine();
 }
 
+// I could have simply use the InfinityLoop but i wanted a seprate loop for the first or rootLoop
 /// First Loop of the game
 class SingularityLoop extends InfinityLoop {
   @override

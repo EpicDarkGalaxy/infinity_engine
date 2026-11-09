@@ -7,7 +7,7 @@ import 'package:infinity_engine/infinity_engine/infinity_engine.dart'
 
 void main() {
   final engine = InfinityEngine();
-  engine.debugMode = false;
+  engine.debugMode = false; // Shows only Colliders for now
   engine.init();
 
   runApp(Singularity(rootLoop: HitThemGame()));
@@ -19,13 +19,15 @@ class HitThemGame extends SingularityLoop {
 
   @override
   void start() {
-    InfinityLayer.addLayer(InfinityLayer(name: "Background", zIndex: 0));
+    InfinityLayer.addLayer(InfinityLayer(name: "Background", zIndex: 0)); // Create a new Layer for background with zIndex = 0 to have behind everything
     final testObject = InfinityObject(
       state: InfinityObjectState(name: "Spawner")..isVisible = false,
       loops: [Game()],
     );
     final backGround = InfinityUi(
-      layer: InfinityLayer.getLayerByName("Background"),
+      layer: InfinityLayer.getLayerByName(
+        "Background",
+      ), // putting the background under the "Background" layer
       child: flutter.Container(
         decoration: flutter.BoxDecoration(color: flutter.Colors.black),
         child: const flutter.Center(child: flutter.SizedBox.expand()),

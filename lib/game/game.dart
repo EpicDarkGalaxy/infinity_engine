@@ -14,8 +14,7 @@ class Game extends InfinityLoop {
   final double moveSpeed = 300;
   double enemyMoveSpeed = 100;
   final double jumpForce = 500;
-  final double jumpInterval = 0.3;
-  double jumpIntervalCounter = 0;
+  double jumpCooldown = 0.3;
 
   double hitIndicationCooldown = 0.3;
 
@@ -25,7 +24,7 @@ class Game extends InfinityLoop {
 
   @override
   void update(double dt) {
-    jumpIntervalCounter += dt;
+    jumpCooldown -= dt;
     moveShooter();
     moveEnemy();
 
@@ -35,7 +34,7 @@ class Game extends InfinityLoop {
 
     if (hitIndicationCooldown <= 0) {
       if (!shooter.isColliding) {
-        shooter.color = Colors.cyanAccent;
+        shooter.color = const Color.fromARGB(255, 25, 0, 255);
       }
       hitIndicationCooldown = 0.3;
     }
@@ -47,14 +46,13 @@ class Game extends InfinityLoop {
 
   void checkCollision(InfinityObject other) {
     if (other.state.name == "Enemy") {
-      shooter.color = Colors.greenAccent;
+      shooter.color = const Color.fromARGB(255, 255, 136, 0);
       enemies.remove(other);
       InfinityEngine.removeObject(other);
 
       scoreNotifier.value++;
       enemyMoveSpeed += 3;
     } else {
-      shooter.color = Colors.cyanAccent;
       hitIndicationCooldown = 0.3;
     }
   }
@@ -68,9 +66,9 @@ class Game extends InfinityLoop {
       shooter.position += input;
     }
     if (InfinityInput.isPressed(InfinityInput.keys.space)) {
-      if (jumpIntervalCounter > jumpInterval) {
+      if (jumpCooldown <= 0) {
         shooterBody.addImpulse(Vector2(0, -jumpForce * shooterBody.mass));
-        jumpIntervalCounter = 0;
+        jumpCooldown = 0.3;
       }
     }
   }
@@ -144,7 +142,7 @@ class Game extends InfinityLoop {
         name: "Shooter",
         position: Vector2(300, 500),
         size: Vector2(50, 50),
-        color: Colors.cyanAccent,
+        color: const Color.fromARGB(255, 25, 0, 255),
       ),
     );
     shooterBody = RigidBody(object: shooter, useGravity: true, mass: 10);
