@@ -4,7 +4,6 @@ import 'package:infinity_engine/infinity_engine/components/render/collider_debug
 import 'package:infinity_engine/infinity_engine/components/infinity_input/input_listener.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/base_collider.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_tick.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_time.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
@@ -50,7 +49,7 @@ class InfinityEngine {
     if (!isRunning) return;
 
     // Apply components
-    applyComponents(deltaTime);
+    _applyComponents(deltaTime);
 
     // Run individual update callbacks (scripts)
     for (var call in _updateCallbacks) {
@@ -59,23 +58,16 @@ class InfinityEngine {
   }
 
   /// Apply all component's effect to all objects
-  void applyComponents(double deltaTime) {
+  void _applyComponents(double deltaTime) {
     final objects = container.objects;
     for (int i = 0; i < objects.length; i++) {
       var object = objects[i];
       for (var component in object.components) {
+        // Start from i + 1 to avoid checking pairs twice and skipping self
         component.apply(deltaTime);
-
-        if (component is BaseCollider) {
-          // Start from i + 1 to avoid checking pairs twice and skipping self
-          for (int j = i + 1; j < objects.length; j++) {
-            var other = objects[j];
-            for (var otherComponent in other.components) {
-              if (otherComponent is BaseCollider) {
-                component.overlaps(otherComponent);
-              }
-            }
-          }
+        for (int j = i + 1; j < objects.length; j++) {
+          var other = objects[j];
+          component.checkWith(other);
         }
       }
     }
@@ -95,13 +87,11 @@ class InfinityEngine {
       flutter.debugPrint('Engine is not running');
       return;
     }
-    if (object.loops != null) {
+    if (object.loops.isNotEmpty) {
       flutter.debugPrint('Calling Start for the object "${object.state.name}"');
-      for (var loop in object.loops!) {
+      for (var loop in object.loops) {
         loop.start();
       }
-    } else {
-      flutter.debugPrint('Object "${object.state.name}" has no loops');
     }
   }
 
@@ -132,10 +122,11 @@ class InfinityEngine {
   }
 
   void _addCallbacks(InfinityObject object) {
-    if (object.loops == null) return;
-    for (InfinityLoop loop in object.loops!) {
+    if (object.loops.isEmpty) return;
+    for (InfinityLoop loop in object.loops) {
       if (!isRunning) {
-        // If engine is running, don't start callbacks to the list
+        // If engine is running, don't add start callbacks to the list because
+        // they will be called before the next frame.
         _startCallbacks.add(loop.start);
       }
       _updateCallbacks.add(loop.update);

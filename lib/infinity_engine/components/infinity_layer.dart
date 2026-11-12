@@ -20,7 +20,7 @@ class InfinityLayer {
     name: "Default Layer",
     zIndex: 0,
     isVisible: true,
-    isCollidable: false,
+    isCollidable: true,
   );
 
   static final InfinityLayer uiLayer = InfinityLayer(

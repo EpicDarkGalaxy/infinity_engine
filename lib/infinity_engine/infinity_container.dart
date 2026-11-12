@@ -14,6 +14,14 @@ class InfinityContainer {
     return true;
   }
 
+  InfinityObject getObject(String name) {
+    return _objects.firstWhere((element) => element.name == name);
+  }
+
+  /// Removes the object from the container.
+  ///
+  /// Returns true if the object was removed, false otherwise.
+  /// (This is the same as the return value of [List.remove])
   bool removeObject(InfinityObject object) {
     return _objects.remove(object);
   }

@@ -7,8 +7,9 @@ import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 class InfinityObjectState extends ChangeNotifier {
   final String id;
-  final String name;
   final BoxShape _shape;
+
+  String name;
 
   InfinityLayer _layer;
 
@@ -50,6 +51,7 @@ class InfinityObjectState extends ChangeNotifier {
        previousColor = color,
        currentColor = color;
 
+  // Getters for current values
   Vector2 get position => currentPosition;
   Vector2 get size => currentSize;
   double get rotation => currentRotation;
@@ -107,10 +109,23 @@ class InfinityObjectState extends ChangeNotifier {
 }
 
 class InfinityObject extends StatelessWidget {
-  InfinityObject({super.key, required this.state, this.loops});
+  InfinityObject({
+    super.key,
+    InfinityObjectState? state,
+    List<InfinityLoop>? loops,
+  }) {
+    state ??= InfinityObjectState();
+    this.state = state;
+    if (loops != null) {
+      for (var loop in loops) {
+        this.loops.add(loop);
+      }
+    }
+  }
 
-  final InfinityObjectState state;
-  final List<InfinityLoop>? loops; // Scripts that are attached to this object
+  late final InfinityObjectState state;
+  final List<InfinityLoop> loops =
+      []; // Scripts that are attached to this object
   final List<InfinityComponent> _components = []; // Components that are attached to this object (eg. Collision, RigidBody)
 
   // Proxy setter and getters for convenience if accessing via object reference
@@ -144,6 +159,7 @@ class InfinityObject extends StatelessWidget {
   }
 
   // Getters
+  String get name => state.name;
   Vector2 get position => state.position;
   Vector2 get size => state.size;
   double get rotation => state.rotation;

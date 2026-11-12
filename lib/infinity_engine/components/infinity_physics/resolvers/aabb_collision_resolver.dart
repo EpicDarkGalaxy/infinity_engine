@@ -50,6 +50,10 @@ class AABBCollisionResolver {
       final double direction = (topA < topB) ? -1.0 : 1.0;
       _resolveY(objA, objB, bodyA, bodyB, overlapY * direction, bounciness.y);
     }
+
+    // Reset collision flags
+    objA.isColliding = false;
+    objB.isColliding = false;
   }
 
   static void _resolveX(

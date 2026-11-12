@@ -1,22 +1,20 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:infinity_engine/game/enemies/base_enemy.dart';
+import 'package:infinity_engine/game/enemies/tough_enemy.dart';
+import 'package:infinity_engine/game/enemies/weak_enemy.dart';
+import 'package:infinity_engine/game/player.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
-class Game extends InfinityLoop {
-  late final InfinityObject shooter;
-  late final RigidBody shooterBody;
-
-  final List<InfinityObject> enemies = [];
+class Game with InfinityLoop {
+  final List<BaseEnemy> enemies = [];
+  final List<BaseEnemy Function()> enemyPool = [
+    () => WeakEnemy(),
+    () => ToughEnemy(),
+  ];
   final int maxEnemies = 5;
-
-  final double moveSpeed = 300;
-  double enemyMoveSpeed = 100;
-  final double jumpForce = 500;
-  double jumpCooldown = 0.3;
-
-  double hitIndicationCooldown = 0.3;
 
   // Reactive score notifier for high-performance UI updates
   final ValueNotifier<int> scoreNotifier = ValueNotifier<int>(0);
@@ -24,60 +22,16 @@ class Game extends InfinityLoop {
 
   @override
   void update(double dt) {
-    jumpCooldown -= dt;
-    moveShooter();
     moveEnemy();
-
-    if (hitIndicationCooldown > 0) {
-      hitIndicationCooldown -= dt;
-    }
-
-    if (hitIndicationCooldown <= 0) {
-      if (!shooter.isColliding) {
-        shooter.color = const Color.fromARGB(255, 25, 0, 255);
-      }
-      hitIndicationCooldown = 0.3;
-    }
 
     if (enemies.length < maxEnemies) {
       spawnEnemy();
     }
   }
 
-  void checkCollision(InfinityObject other) {
-    if (other.state.name == "Enemy") {
-      shooter.color = const Color.fromARGB(255, 255, 136, 0);
-      enemies.remove(other);
-      InfinityEngine.removeObject(other);
-
-      scoreNotifier.value++;
-      enemyMoveSpeed += 3;
-    } else {
-      hitIndicationCooldown = 0.3;
-    }
-  }
-
-  void moveShooter() {
-    final Vector2 input = Vector2(moveSpeed * InfinityTime.deltaTime, 0);
-    if (InfinityInput.isPressed(InfinityInput.keys.left)) {
-      shooter.position += -input;
-    }
-    if (InfinityInput.isPressed(InfinityInput.keys.right)) {
-      shooter.position += input;
-    }
-    if (InfinityInput.isPressed(InfinityInput.keys.space)) {
-      if (jumpCooldown <= 0) {
-        shooterBody.addImpulse(Vector2(0, -jumpForce * shooterBody.mass));
-        jumpCooldown = 0.3;
-      }
-    }
-  }
-
   void moveEnemy() {
-    final Vector2 input = Vector2(0, enemyMoveSpeed * InfinityTime.deltaTime);
-
     for (var enemy in enemies) {
-      enemy.position += input;
+      enemy.move(InfinityTime.deltaTime);
     }
 
     enemies.removeWhere((element) {
@@ -90,14 +44,8 @@ class Game extends InfinityLoop {
   }
 
   void spawnEnemy() {
-    final enemy = InfinityObject(
-      state: InfinityObjectState(
-        name: "Enemy",
-        position: Vector2(Random().nextDouble() * 950, -200),
-        size: Vector2(45, 45),
-        color: Colors.deepOrangeAccent,
-      ),
-    );
+    final enemy = enemyPool[Random().nextInt(enemyPool.length)]();
+    enemy.position = Vector2(Random().nextDouble() * 950, -200);
     enemy.addComponent(RigidBody(object: enemy, useGravity: false, mass: 10));
     enemy.addComponent(AABBCollider(object: enemy));
     InfinityEngine.addObject(enemy);
@@ -107,7 +55,6 @@ class Game extends InfinityLoop {
   @override
   void start() {
     setUpShooter();
-
     // Styled arcade HUD using ValueListenableBuilder
     scoreText = InfinityUi(
       padding: const EdgeInsets.all(16.0),
@@ -137,7 +84,7 @@ class Game extends InfinityLoop {
   }
 
   void setUpShooter() {
-    shooter = InfinityObject(
+    final shooter = InfinityObject(
       state: InfinityObjectState(
         name: "Shooter",
         position: Vector2(300, 500),
@@ -145,16 +92,10 @@ class Game extends InfinityLoop {
         color: const Color.fromARGB(255, 25, 0, 255),
       ),
     );
-    shooterBody = RigidBody(object: shooter, useGravity: true, mass: 10);
+    final shooterBody = RigidBody(object: shooter, useGravity: true, mass: 10);
+    shooter.loops.add(Player(shooter: shooter, shooterBody: shooterBody));
     shooter.addComponent(shooterBody);
-    shooter.addComponent(
-      AABBCollider(
-        object: shooter,
-        onCollision: (other) {
-          checkCollision(other);
-        },
-      ),
-    );
+    shooter.addComponent(AABBCollider(object: shooter));
     InfinityEngine.addObject(shooter);
   }
 }
