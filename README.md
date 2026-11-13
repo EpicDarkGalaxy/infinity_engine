@@ -6,7 +6,7 @@ the engine during development, not the main product.
 
 # Note
 
-Ai was used in the making of the engine.
+Ai was used in the making of this engine.
 
 ## Repository Layout
 
