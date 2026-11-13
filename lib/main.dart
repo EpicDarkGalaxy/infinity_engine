@@ -29,7 +29,7 @@ class HitThemGame extends SingularityLoop {
         "Background",
       ), // putting the background under the "Background" layer
       child: flutter.Container(
-        decoration: flutter.BoxDecoration(color: flutter.Colors.black),
+        decoration: flutter.BoxDecoration(color: flutter.Colors.grey[900]),
         child: const flutter.Center(child: flutter.SizedBox.expand()),
       ),
     );

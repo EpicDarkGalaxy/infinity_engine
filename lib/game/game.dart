@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:infinity_engine/game/enemies/base_enemy.dart';
 import 'package:infinity_engine/game/enemies/ground_eater_enemy.dart';
+import 'package:infinity_engine/game/enemies/keel_enemy.dart';
 import 'package:infinity_engine/game/enemies/tough_enemy.dart';
 import 'package:infinity_engine/game/enemies/weak_enemy.dart';
 import 'package:infinity_engine/game/player.dart';
@@ -16,6 +17,7 @@ class Game with InfinityLoop, OnCollisionCallBack {
     () => WeakEnemy(),
     () => ToughEnemy(),
     () => GroundEaterEnemy(),
+    () => KeelEnemy(),
   ];
   final int maxEnemies = 5;
   int score = 0;
@@ -133,7 +135,12 @@ class Game with InfinityLoop, OnCollisionCallBack {
         layer: InfinityLayer.getLayerByName("Shooter")!,
       ),
     );
-    final shooterBody = RigidBody(object: shooter, useGravity: true, mass: 10);
+    final shooterBody = RigidBody(
+      object: shooter,
+      useGravity: true,
+      mass: 20,
+      gravityScale: 1.2,
+    );
     shooter.addLoop(Player(shooter: shooter, shooterBody: shooterBody));
     shooter.addComponent(shooterBody);
     shooter.addComponent(AABBCollider(object: shooter));

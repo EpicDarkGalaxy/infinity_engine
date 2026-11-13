@@ -16,6 +16,7 @@ class RigidBody extends InfinityComponent {
     required this.object,
     this.mass = 1.0,
     this.drag = 0.0005,
+    this.gravityScale = 1.0,
     this.isStatic = false,
     this.manualTrigger = false,
     this.useGravity = true,
@@ -26,6 +27,7 @@ class RigidBody extends InfinityComponent {
   final double invMass;
   final bool isStatic;
   final double drag;
+  double gravityScale;
   bool manualTrigger;
   bool useGravity;
 
@@ -60,7 +62,8 @@ class RigidBody extends InfinityComponent {
 
     // Automatically add gravity force (F = m * g) if enabled
     if (useGravity) {
-      _forceAccumulator = _forceAccumulator + Vector2(0, globalGravity * mass);
+      _forceAccumulator =
+          _forceAccumulator + Vector2(0, globalGravity * gravityScale * mass);
     }
 
     // F = ma -> a = F * invMass

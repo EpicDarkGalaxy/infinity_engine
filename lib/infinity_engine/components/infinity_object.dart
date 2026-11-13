@@ -4,6 +4,7 @@ import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2
 import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
+import 'package:collection/collection.dart';
 
 class InfinityObjectState extends ChangeNotifier {
   final String id;
@@ -188,6 +189,10 @@ class InfinityObject extends StatelessWidget {
 
   /// Loops are not meant to be modified directly, InfinityObject.addLoop
   List<InfinityLoop> get loops => List.unmodifiable(_loops);
+
+  T? getComponent<T extends InfinityComponent>() {
+    return _components.firstWhereOrNull((component) => component is T) as T?;
+  }
 
   void removeComponent(InfinityComponent component) {
     _components.remove(component);
