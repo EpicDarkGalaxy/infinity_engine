@@ -4,5 +4,5 @@ class InfinityComponent {
   /// Called every frame by InfinityTick's logic tick
   void apply(double dt) {}
 
-  void checkWith(InfinityObject other) {}
+  void collideWith(InfinityObject other) {}
 }

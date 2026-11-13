@@ -44,6 +44,12 @@ class BaseEnemy extends InfinityObject with OnCollisionCallBack {
     if (event.other.object.name == "Shooter") {
       enemyState.health -= 100;
       if (enemyState.health <= 0) {
+        ParticleSystem.burst(
+          position: position + size / 2,
+          color: color,
+          layer: layer,
+        );
+
         InfinityEngine.removeObject(this);
       }
     }

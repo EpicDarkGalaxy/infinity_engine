@@ -1,5 +1,6 @@
 // Exposes components to the rest of the application
 export 'components/infinity_loop.dart' show InfinityLoop;
+export 'components/particle_system.dart' show ParticleSystem;
 export 'components/infinity_object.dart'
     show InfinityObject, InfinityObjectState;
 export 'components/infinity_ui.dart' show InfinityUi;

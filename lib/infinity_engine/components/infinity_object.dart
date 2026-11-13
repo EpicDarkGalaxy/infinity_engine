@@ -14,6 +14,7 @@ class InfinityObjectState extends ChangeNotifier {
   InfinityLayer _layer;
 
   bool _hidden = false;
+  bool _hasPendingChanges = false;
   bool isColliding = false;
 
   // Position tracking
@@ -58,20 +59,22 @@ class InfinityObjectState extends ChangeNotifier {
   Color get color => currentColor;
   InfinityLayer get layer => _layer;
   BoxShape get shape => _shape;
-  bool get isVisible => !_hidden;
+  bool get visibility => !_hidden;
 
   // Setters that automatically cache previous values for smooth transitions
   set position(Vector2 newPos) {
-    if (currentPosition != newPos) {
+    if (!_sameVector(currentPosition, newPos)) {
       previousPosition = currentPosition;
       currentPosition = newPos;
+      _hasPendingChanges = true;
     }
   }
 
   set size(Vector2 newSize) {
-    if (currentSize != newSize) {
+    if (!_sameVector(currentSize, newSize)) {
       previousSize = currentSize;
       currentSize = newSize;
+      _hasPendingChanges = true;
     }
   }
 
@@ -79,6 +82,7 @@ class InfinityObjectState extends ChangeNotifier {
     if (currentRotation != newRotation) {
       previousRotation = currentRotation;
       currentRotation = newRotation;
+      _hasPendingChanges = true;
     }
   }
 
@@ -86,6 +90,7 @@ class InfinityObjectState extends ChangeNotifier {
     if (currentColor != newColor) {
       previousColor = currentColor;
       currentColor = newColor;
+      _hasPendingChanges = true;
     }
   }
 
@@ -96,16 +101,20 @@ class InfinityObjectState extends ChangeNotifier {
     }
   }
 
-  set isVisible(bool isVisible) {
+  set visibility(bool isVisible) {
+    if (visibility == isVisible) return;
     _hidden = !isVisible;
-    if (_hidden) {
-      debugPrint('Object "$name" is hidden');
-    }
+    notifyListeners();
   }
 
   void update() {
+    if (!_hasPendingChanges) return;
+    _hasPendingChanges = false;
     notifyListeners();
   }
+
+  bool _sameVector(Vector2 first, Vector2 second) =>
+      first.x == second.x && first.y == second.y;
 }
 
 class InfinityObject extends StatelessWidget {
@@ -117,16 +126,24 @@ class InfinityObject extends StatelessWidget {
     state ??= InfinityObjectState();
     this.state = state;
     if (loops != null) {
-      for (var loop in loops) {
-        this.loops.add(loop);
-      }
+      _loops.addAll(loops);
     }
   }
 
   late final InfinityObjectState state;
-  final List<InfinityLoop> loops =
+  final List<InfinityLoop> _loops =
       []; // Scripts that are attached to this object
   final List<InfinityComponent> _components = []; // Components that are attached to this object (eg. Collision, RigidBody)
+
+  // Add Loop to object
+  void addLoop(InfinityLoop loop) {
+    _loops.add(loop);
+    InfinityEngine.addStartCallback(loop.start);
+  }
+
+  void removeLoop(InfinityLoop loop) {
+    _loops.remove(loop);
+  }
 
   // Proxy setter and getters for convenience if accessing via object reference
   // Setters
@@ -146,8 +163,8 @@ class InfinityObject extends StatelessWidget {
     state.color = newColor;
   }
 
-  set isVisible(bool isVisible) {
-    state.isVisible = isVisible;
+  set visibility(bool isVisible) {
+    state.visibility = isVisible;
   }
 
   set isColliding(bool isColliding) {
@@ -165,9 +182,12 @@ class InfinityObject extends StatelessWidget {
   double get rotation => state.rotation;
   Color get color => state.color;
   InfinityLayer get layer => state.layer;
-  bool get isVisible => state.isVisible;
+  bool get visibility => state.visibility;
   bool get isColliding => state.isColliding;
   List<InfinityComponent> get components => _components;
+
+  /// Loops are not meant to be modified directly, InfinityObject.addLoop
+  List<InfinityLoop> get loops => List.unmodifiable(_loops);
 
   void removeComponent(InfinityComponent component) {
     _components.remove(component);
@@ -181,18 +201,21 @@ class InfinityObject extends StatelessWidget {
     _components.addAll(component);
   }
 
-  // Force update, Called by InfinityTick's RenderTick
-  void update() {
-    if (!state.isVisible) return; // If object is not visible, don't update
+  // Flushes batched visual changes on the render tick.
+  void refresh() {
     state.update();
+  }
+
+  void hide() {
+    state.visibility = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!state.isVisible) return const SizedBox.shrink();
     return ListenableBuilder(
       listenable: state,
       builder: (context, child) {
+        if (!state.visibility) return const SizedBox.shrink();
         return Transform.translate(
           offset: state.position.toOffset,
           child: Transform.rotate(

@@ -45,7 +45,7 @@ void runApp(Singularity gameWidget) {
   final rootObject = InfinityObject(
     state: InfinityObjectState(name: "rootLoop", color: flutter.Colors.black),
     loops: [gameWidget.rootLoop, InfinityTime()],
-  )..isVisible = false;
+  )..hide();
   InfinityEngine.addObject(rootObject);
   flutter.runApp(gameWidget);
   InfinityEngine().startEngine();

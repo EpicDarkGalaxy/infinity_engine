@@ -9,8 +9,8 @@ import 'package:infinity_engine/infinity_engine/components/infinity_object.dart'
 class InfinityLayer {
   final String name;
   final int zIndex;
-  final bool isVisible;
-  final bool isCollidable;
+  bool isVisible;
+  bool isCollidable;
 
   final List<InfinityObject> _objects = [];
 

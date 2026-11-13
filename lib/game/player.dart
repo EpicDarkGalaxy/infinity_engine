@@ -7,7 +7,10 @@ class Player with InfinityLoop, OnCollisionCallBack {
   Player({required this.shooter, required this.shooterBody});
   late final RigidBody shooterBody;
   final InfinityObject shooter;
-  final double moveSpeed = 300;
+  double moveSpeed = 100;
+  bool isOnGround = false;
+  final double onGroundSpeed = 100;
+  final double inAirSpeed = 300;
 
   final double dashForce = 300;
   bool isDashing = false;
@@ -38,6 +41,16 @@ class Player with InfinityLoop, OnCollisionCallBack {
       hitIndicationCooldown = 0.3;
     }
 
+    if (isOnGround) {
+      moveSpeed = onGroundSpeed;
+    } else {
+      moveSpeed = inAirSpeed;
+    }
+
+    if (!shooter.isColliding) {
+      isOnGround = false;
+    }
+
     moveShooter();
     if (dashDuration < 0) {
       shooterBody.velocity = Vector2(0, shooterBody.velocity.y);
@@ -54,10 +67,16 @@ class Player with InfinityLoop, OnCollisionCallBack {
   void moveShooter() {
     final Vector2 input = Vector2(moveSpeed * InfinityTime.deltaTime, 0);
     Vector2 direction = Vector2.zero;
-    if (InfinityInput.isPressed(InfinityInput.keys.left)) {
+    if (InfinityInput.isAnyPressed([
+      InfinityInput.keys.left,
+      InfinityInput.keys.a,
+    ])) {
       direction = -input;
     }
-    if (InfinityInput.isPressed(InfinityInput.keys.right)) {
+    if (InfinityInput.isAnyPressed([
+      InfinityInput.keys.right,
+      InfinityInput.keys.d,
+    ])) {
       direction = input;
     }
     if (InfinityInput.isPressed(InfinityInput.keys.space) &&
@@ -82,6 +101,9 @@ class Player with InfinityLoop, OnCollisionCallBack {
   void onCollisionEvent(event) {
     if (event.other.object is BaseEnemy) {
       shooter.color = const Color.fromARGB(255, 255, 0, 0);
+    }
+    if (event.other.object.name == "Ground") {
+      isOnGround = true;
     }
   }
 }

@@ -21,7 +21,7 @@ class HitThemGame extends SingularityLoop {
   void start() {
     InfinityLayer.addLayer(InfinityLayer(name: "Background", zIndex: 0)); // Create a new Layer for background with zIndex = 0 to have behind everything
     final testObject = InfinityObject(
-      state: InfinityObjectState(name: "Spawner")..isVisible = false,
+      state: InfinityObjectState(name: "Spawner")..visibility = false,
       loops: [Game()],
     );
     final backGround = InfinityUi(

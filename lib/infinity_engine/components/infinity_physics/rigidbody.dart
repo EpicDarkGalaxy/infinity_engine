@@ -78,10 +78,10 @@ class RigidBody extends InfinityComponent {
   }
 
   @override
-  void apply(double deltaTime) {
+  void apply(double dt) {
     if (manualTrigger || isStatic) {
       return;
     }
-    applyForce(deltaTime);
+    applyForce(dt);
   }
 }

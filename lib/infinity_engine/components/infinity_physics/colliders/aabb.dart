@@ -4,19 +4,20 @@ import 'package:infinity_engine/infinity_engine/components/infinity_physics/reso
 class AABBCollider extends BaseCollider {
   /// - [object] is the parent object of this collider
   /// - [size] is the size of the collider, if null, it will be the same as the parent object
+  /// - [onCollision] is the function that will be called when the collider collides with another collider
+  /// - [bounciness] is the bounciness of the collider, if null, it will be 0
+  /// - [ignore] is the list of layers that this collider will ignore
   AABBCollider({
     required super.object,
     super.size,
     super.onCollision,
     super.bounciness,
+    super.ignore,
   });
 
   @override
   void overlaps(BaseCollider other) {
-    if (object.layer.zIndex != other.object.layer.zIndex ||
-        !object.layer.isCollidable && !other.object.layer.isCollidable) {
-      return; // Only check collisions within the same layer or if both are collidable
-    }
+    if (!canCollide(other)) return;
 
     // Check if the other collider is an AABBCollider
     final bool isCollidingX =
@@ -43,14 +44,5 @@ class AABBCollider extends BaseCollider {
         bounciness,
       );
     }
-  }
-
-  @override
-  void apply(double deltaTime) {
-    // for (final collider in other.components) {
-    //   if (collider is BaseCollider) {
-    //     overlaps(collider);
-    //   }
-    // }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_component.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
@@ -8,6 +9,7 @@ abstract class BaseCollider extends InfinityComponent {
   final InfinityObject object;
   Vector2? size;
   Vector2 bounciness;
+  final List<InfinityLayer> ignore;
   final void Function(BaseCollider other)? onCollision;
 
   BaseCollider({
@@ -15,6 +17,7 @@ abstract class BaseCollider extends InfinityComponent {
     this.size,
     this.bounciness = const Vector2(0, 0),
     this.onCollision,
+    this.ignore = const [],
   }) {
     size ??= object.size;
   }
@@ -29,6 +32,16 @@ abstract class BaseCollider extends InfinityComponent {
       }
     }
     return (false, null);
+  }
+
+  bool canCollide(BaseCollider other) {
+    if (ignore.contains(other.object.layer) ||
+        other.ignore.contains(object.layer) ||
+        !object.layer.isCollidable ||
+        !other.object.layer.isCollidable) {
+      return false;
+    }
+    return true;
   }
 
   @mustCallSuper
@@ -69,7 +82,7 @@ abstract class BaseCollider extends InfinityComponent {
   }
 
   @override
-  Future<void> checkWith(InfinityObject other) async {
+  Future<void> collideWith(InfinityObject other) async {
     for (InfinityComponent component in other.components) {
       if (component is BaseCollider) {
         overlaps(component);

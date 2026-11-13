@@ -15,6 +15,15 @@ class InfinityInput {
     return _pressedKeys.contains(key);
   }
 
+  static bool isAnyPressed(List<LogicalKeyboardKey> keys) {
+    for (final key in keys) {
+      if (isPressed(key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static KeyEventResult handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
       _pressedKeys.add(event.logicalKey);

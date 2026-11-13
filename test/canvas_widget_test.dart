@@ -28,6 +28,19 @@ void main() {
   });
 
   group('CanvasController', () {
+    test('reuses ordered objects until the canvas changes', () {
+      final controller = CanvasController();
+      final background = Container();
+      controller.addObject(0, background);
+      final firstSnapshot = controller.objects;
+
+      expect(identical(firstSnapshot, controller.objects), isTrue);
+
+      controller.addObject(1, Container());
+
+      expect(identical(firstSnapshot, controller.objects), isFalse);
+    });
+
     test(
       'orders layers by z-index and preserves insertion order within layers',
       () {
@@ -50,7 +63,31 @@ void main() {
         ]);
       },
     );
+  });
 
+  testWidgets('reports the canvas logical size from its layout constraints', (
+    tester,
+  ) async {
+    final controller = CanvasController();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Center(
+          child: SizedBox(
+            width: 320,
+            height: 240,
+            child: CanvasWidget(controller: controller),
+          ),
+        ),
+      ),
+    );
+
+    final canvasSize = controller.getCanvasSize();
+    expect(canvasSize.x, 320);
+    expect(canvasSize.y, 240);
+  });
+
+  group('CanvasController removal', () {
     test('removes objects from the specified layer', () {
       final controller = CanvasController();
       final object = Container();

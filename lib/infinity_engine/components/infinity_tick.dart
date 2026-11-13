@@ -71,7 +71,7 @@ class _InfinityTickState extends State<InfinityTick>
         while (_accumulatedRenderTime.inMicroseconds >=
             _targetRenderMicrosecondsPerFrame) {
           for (var object in InfinityEngine().objects) {
-            object.update();
+            object.refresh();
           }
 
           _accumulatedRenderTime -= Duration(

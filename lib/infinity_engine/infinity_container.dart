@@ -1,21 +1,30 @@
+import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 
-/// Owns the objects currently registered with the engine.
+/// Owns the objects and loops currently registered with the engine.
 class InfinityContainer {
   final List<InfinityObject> _objects = [];
 
   List<InfinityObject> get objects => List.unmodifiable(_objects);
+  List<InfinityLoop> get loops {
+    return _objects.expand((object) => object.loops).toList();
+  }
 
   bool containsObject(InfinityObject object) => _objects.contains(object);
 
   bool addObject(InfinityObject object) {
-    if (_objects.contains(object)) return false;
+    if (containsObject(object)) return false;
     _objects.add(object);
     return true;
   }
 
-  InfinityObject getObject(String name) {
-    return _objects.firstWhere((element) => element.name == name);
+  InfinityObject? getObjectByName(String name) {
+    for (InfinityObject obj in _objects) {
+      if (obj.name == name) {
+        return obj;
+      }
+    }
+    return null;
   }
 
   /// Removes the object from the container.

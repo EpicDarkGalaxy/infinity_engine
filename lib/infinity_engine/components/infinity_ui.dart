@@ -33,7 +33,7 @@ class InfinityUi extends InfinityObject {
     return ListenableBuilder(
       listenable: state,
       builder: (context, child) {
-        if (!state.isVisible) return const SizedBox.shrink();
+        if (!state.visibility) return const SizedBox.shrink();
 
         Widget content = Align(
           alignment: alignment,
