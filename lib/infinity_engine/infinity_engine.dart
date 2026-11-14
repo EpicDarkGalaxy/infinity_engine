@@ -90,6 +90,15 @@ class InfinityEngine {
     InfinityLayer.addObject(object);
     engine._canvasController.addObject(object.layer.zIndex, object);
 
+    if (object is InfinityLoop) {
+      final loop = object as InfinityLoop;
+      if (engine.isRunning) {
+        loop.start();
+      } else {
+        engine._startCallbacks.add(loop.start);
+      }
+    }
+
     for (InfinityLoop loop in object.loops) {
       if (engine.isRunning) {
         loop.start();

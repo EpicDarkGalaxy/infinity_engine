@@ -1,16 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:infinity_engine/game/effects/base_effect.dart';
 import 'package:infinity_engine/game/effects/effect_container.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
-import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
-class GravityUp extends BaseEffect with InfinityLoop {
+class GravityUp extends BaseEffect {
   GravityUp({required super.parent, required super.target}) {
     duration = 10;
   }
-
-  late final ValueNotifier<int> timerNotifier;
-  late final InfinityUi timerText;
 
   late final RigidBody _body;
 
@@ -20,22 +15,16 @@ class GravityUp extends BaseEffect with InfinityLoop {
     if (body == null) return;
     _body = body;
     _body.gravityScale = 1.5;
-    isActive = true;
+
+    kickTimer();
   }
 
   @override
-  void update(double dt) {
-    if (isActive) {
-      duration -= dt;
-      timerNotifier.value = duration.toInt();
-      if (duration <= 0) {
-        isActive = false;
-        _body.gravityScale = 1;
-        EffectContainer.removeEffect(this);
-        InfinityEngine.removeObject(timerText);
-        parent.removeLoop(this);
-      }
-    }
+  void onTimerEnd() {
+    isActive = false;
+    _body.gravityScale = 1;
+    EffectContainer.removeEffect(this);
+    parent.removeLoop(this);
   }
 
   @override
@@ -45,13 +34,8 @@ class GravityUp extends BaseEffect with InfinityLoop {
       oldEffect.duration += duration;
       return;
     }
-    timerNotifier = ValueNotifier(duration.toInt());
-    timerText = buildUI(
-      timerNotifier,
-      const EdgeInsets.fromLTRB(16, 100, 16, 16),
-      "Gravity Boost",
-    );
-    InfinityEngine.addObject(timerText);
+
+    buildUI("Gravity Boost");
     EffectContainer.addEffect(this);
     apply();
   }

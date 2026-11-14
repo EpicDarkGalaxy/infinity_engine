@@ -3,11 +3,13 @@ import 'package:infinity_engine/game/enemies/base_enemy.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/on_collision_callback.dart';
 
-class Player with InfinityLoop, OnCollisionCallBack {
-  Player({required this.shooter, required this.shooterBody});
-  late final RigidBody shooterBody;
-  final InfinityObject shooter;
+class PlayerStats {
+  static int health = 100;
+  static int maxHealth = 100;
+  static int damage = 50;
+}
 
+class PlayerState {
   double moveSpeed = 100;
   final double maxSpeed = 800;
   final double onGroundSpeed = 100;
@@ -24,9 +26,18 @@ class Player with InfinityLoop, OnCollisionCallBack {
   double jumpCooldown = 0.3;
 
   double hitIndicationCooldown = 0.3;
+}
+
+class Player extends InfinityObject with InfinityLoop, OnCollisionCallBack {
+  Player({super.key, required InfinityObjectState state}) : super(state: state);
+  final PlayerStats stats = PlayerStats();
+  final PlayerState _playerState = PlayerState();
+  late final RigidBody shooterBody;
 
   final Color playerHitColor = const Color.fromARGB(255, 255, 0, 0);
   final Color playerColor = const Color.fromARGB(255, 255, 255, 255);
+
+  PlayerState get playerState => _playerState;
 
   @override
   void update(double dt) {
@@ -39,32 +50,34 @@ class Player with InfinityLoop, OnCollisionCallBack {
   }
 
   void checkHit() {
-    if (hitIndicationCooldown > 0) {
-      hitIndicationCooldown -= InfinityTime.deltaTime;
+    if (_playerState.hitIndicationCooldown > 0) {
+      _playerState.hitIndicationCooldown -= InfinityTime.deltaTime;
     }
 
-    if (hitIndicationCooldown <= 0) {
-      if (!shooter.isColliding) {
-        shooter.color = playerColor;
+    if (_playerState.hitIndicationCooldown <= 0) {
+      if (!isColliding) {
+        color = playerColor;
       }
-      hitIndicationCooldown = 0.3;
+      _playerState.hitIndicationCooldown = 0.3;
     }
   }
 
   void checkSpeed() {
-    if (!isDashing) {
-      // this is to allow more x velocity when dashing
-      if (shooterBody.velocity.x > maxSpeed ||
-          shooterBody.velocity.x < -maxSpeed) {
+    // this is to allow more x velocity when dashing
+    if (!_playerState.isDashing) {
+      // Prevernts the player from reaching another dimension
+      if (shooterBody.velocity.x > _playerState.maxSpeed ||
+          shooterBody.velocity.x < -_playerState.maxSpeed) {
         shooterBody.velocity = Vector2(
           shooterBody.velocity.x * 0.9,
           shooterBody.velocity.y,
         );
       }
 
+      // Slow down the player when not pressing anything
       if (shooterBody.velocity.x > 0 || shooterBody.velocity.x < 0) {
         shooterBody.velocity = Vector2(
-          shooterBody.velocity.x * 0.9,
+          shooterBody.velocity.x * 0.8,
           shooterBody.velocity.y,
         );
       }
@@ -72,44 +85,47 @@ class Player with InfinityLoop, OnCollisionCallBack {
   }
 
   void checkIfOnGround() {
-    if (!shooter.isColliding) {
-      isOnGround = false;
+    if (!isColliding) {
+      _playerState.isOnGround = false;
     }
-    if (isOnGround) {
-      moveSpeed = onGroundSpeed;
+    if (_playerState.isOnGround) {
+      _playerState.moveSpeed = _playerState.onGroundSpeed;
     } else {
-      moveSpeed = inAirSpeed;
+      _playerState.moveSpeed = _playerState.inAirSpeed;
     }
   }
 
   void checkJump() {
-    if (jumpCooldown > 0) {
-      jumpCooldown -= InfinityTime.deltaTime;
+    if (_playerState.jumpCooldown > 0) {
+      _playerState.jumpCooldown -= InfinityTime.deltaTime;
     }
   }
 
   void checkDash() {
     final dt = InfinityTime.deltaTime;
-    if (dashCooldown > 0) {
-      dashCooldown -= dt;
+    if (_playerState.dashCooldown > 0) {
+      _playerState.dashCooldown -= dt;
     }
-    if (isDashing) {
-      dashDuration -= dt;
+    if (_playerState.isDashing) {
+      _playerState.dashDuration -= dt;
     }
-    if (dashDuration < 0) {
+    if (_playerState.dashDuration < 0) {
       shooterBody.velocity = Vector2(0, shooterBody.velocity.y);
-      isDashing = false;
-      dashDuration = 0.3;
+      _playerState.isDashing = false;
+      _playerState.dashDuration = 0.3;
     }
   }
 
   @override
   void start() {
-    // TODO: implement start
+    final body = getComponent<RigidBody>();
+    if (body != null) {
+      shooterBody = body;
+    }
   }
 
   void moveShooter() {
-    final Vector2 input = Vector2(moveSpeed, 0);
+    final Vector2 input = Vector2(_playerState.moveSpeed, 0);
     Vector2 direction = Vector2.zero;
     if (InfinityInput.isAnyPressed([
       InfinityInput.keys.left,
@@ -124,19 +140,25 @@ class Player with InfinityLoop, OnCollisionCallBack {
       direction = input;
     }
     if (InfinityInput.isPressed(InfinityInput.keys.space) &&
-        jumpCooldown <= 0) {
-      shooterBody.addImpulse(Vector2(0, -jumpForce * shooterBody.mass));
-      jumpCooldown = 0.3;
+        _playerState.jumpCooldown <= 0) {
+      shooterBody.addImpulse(
+        Vector2(0, -_playerState.jumpForce * shooterBody.mass),
+      );
+      _playerState.jumpCooldown = 0.3;
     }
     if (InfinityInput.isPressed(InfinityInput.keys.shift) &&
-        dashCooldown <= 0) {
-      isDashing = true;
+        _playerState.dashCooldown <= 0) {
+      _playerState.isDashing = true;
       if (direction.x < 0) {
-        shooterBody.addImpulse(Vector2(-dashForce * shooterBody.mass, 0));
+        shooterBody.addImpulse(
+          Vector2(-_playerState.dashForce * shooterBody.mass, 0),
+        );
       } else if (direction.x > 0) {
-        shooterBody.addImpulse(Vector2(dashForce * shooterBody.mass, 0));
+        shooterBody.addImpulse(
+          Vector2(_playerState.dashForce * shooterBody.mass, 0),
+        );
       }
-      dashCooldown = 0.5;
+      _playerState.dashCooldown = 0.5;
     }
     shooterBody.addImpulse(direction * shooterBody.mass);
   }
@@ -144,10 +166,10 @@ class Player with InfinityLoop, OnCollisionCallBack {
   @override
   void onCollisionEvent(event) {
     if (event.other.object is BaseEnemy) {
-      shooter.color = playerHitColor;
+      color = playerHitColor;
     }
     if (event.other.object.name == "Ground") {
-      isOnGround = true;
+      _playerState.isOnGround = true;
     }
   }
 }

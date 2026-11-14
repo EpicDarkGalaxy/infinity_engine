@@ -56,17 +56,15 @@ class Game with InfinityLoop, OnCollisionCallBack {
     if (layer != null) {
       enemy.layer = layer;
     }
+    enemy.onDeath = () {
+      score++;
+      scoreNotifier.value = score;
+    };
     enemy.addComponent(RigidBody(object: enemy, useGravity: false, mass: 10));
     enemy.addComponent(
       AABBCollider(
         object: enemy,
         ignore: [InfinityLayer.getLayerByName("Ground")!],
-        onCollision: (other) {
-          if (other.object.name == "Shooter") {
-            score++;
-            scoreNotifier.value = score;
-          }
-        },
       ),
     );
     InfinityEngine.addObject(enemy);
@@ -126,7 +124,7 @@ class Game with InfinityLoop, OnCollisionCallBack {
   }
 
   void setUpShooter() {
-    final shooter = InfinityObject(
+    final shooter = Player(
       state: InfinityObjectState(
         name: "Shooter",
         position: Vector2(300, 500),
@@ -135,14 +133,9 @@ class Game with InfinityLoop, OnCollisionCallBack {
         layer: InfinityLayer.getLayerByName("Shooter")!,
       ),
     );
-    final shooterBody = RigidBody(
-      object: shooter,
-      useGravity: true,
-      mass: 20,
-      gravityScale: 1.2,
+    shooter.addComponent(
+      RigidBody(object: shooter, useGravity: true, mass: 20),
     );
-    shooter.addLoop(Player(shooter: shooter, shooterBody: shooterBody));
-    shooter.addComponent(shooterBody);
     shooter.addComponent(AABBCollider(object: shooter));
     InfinityEngine.addObject(shooter);
   }

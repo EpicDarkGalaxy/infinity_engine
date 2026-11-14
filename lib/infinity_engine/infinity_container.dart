@@ -7,7 +7,14 @@ class InfinityContainer {
 
   List<InfinityObject> get objects => List.unmodifiable(_objects);
   List<InfinityLoop> get loops {
-    return _objects.expand((object) => object.loops).toList();
+    List<InfinityLoop> loops = [];
+    for (InfinityObject obj in _objects) {
+      if (obj is InfinityLoop) {
+        loops.add(obj as InfinityLoop);
+      }
+      loops.addAll(obj.loops);
+    }
+    return loops;
   }
 
   bool containsObject(InfinityObject object) => _objects.contains(object);

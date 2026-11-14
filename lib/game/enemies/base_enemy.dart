@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:infinity_engine/game/player.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/on_collision_callback.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
@@ -39,17 +40,19 @@ class BaseEnemy extends InfinityObject with OnCollisionCallBack {
     super.color = newColor;
   }
 
+  late final void Function() onDeath;
+
   @override
   void onCollisionEvent(CollisionEvent event) {
-    if (event.other.object.name == "Shooter") {
-      enemyState.health -= 100;
+    if (event.other.object is Player) {
+      enemyState.health -= PlayerStats.damage;
       if (enemyState.health <= 0) {
         ParticleSystem.burst(
           position: position + size / 2,
           color: color,
           layer: layer,
         );
-
+        onDeath();
         InfinityEngine.removeObject(this);
       }
     }

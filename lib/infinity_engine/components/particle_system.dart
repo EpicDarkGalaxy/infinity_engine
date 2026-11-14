@@ -46,7 +46,7 @@ class ParticleSystem with InfinityLoop {
   final List<_Particle> _particles = [];
   bool _started = false;
 
-  /// Creates and registers a radial burst with the current engine.
+  /// Creates and registers a radial burst with the engine.
   static ParticleSystem burst({
     required Vector2 position,
     Color color = Colors.white,
