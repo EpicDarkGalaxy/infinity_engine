@@ -2,7 +2,7 @@
 
 Infinity Engine is an experimental 2D game engine built with Flutter and Dart.
 The repository is engine-first; **Hit Them** is a sample game used to exercise
-the engine during development, not the main product.
+the engine during development.
 
 # Note
 
