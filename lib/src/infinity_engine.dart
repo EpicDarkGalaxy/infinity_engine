@@ -20,9 +20,15 @@ class InfinityEngine {
   double fps = 60;
   bool debugMode = false;
 
-  // Predefined layers for the engine, can be modified by the user
-  // Higher zIndex means the layer will be rendered on top of lower zIndex layers
-  List<InfinityLayer> get layers => InfinityLayer.layers;
+  bool get suppressInfoLogs => InfinityLog.suppressInfoLogs;
+  set suppressInfoLogs(bool value) => InfinityLog.suppressInfoLogs = value;
+
+  bool get suppressWarningLogs => InfinityLog.suppressWarningLogs;
+  set suppressWarningLogs(bool value) =>
+      InfinityLog.suppressWarningLogs = value;
+
+  bool get suppressErrorLogs => InfinityLog.suppressErrorLogs;
+  set suppressErrorLogs(bool value) => InfinityLog.suppressErrorLogs = value;
 
   late final CanvasController _canvasController;
   late final CanvasWidget _canvasWidget;
@@ -100,7 +106,6 @@ class InfinityEngine {
     final engine = InfinityEngine();
     if (!engine._container.addObject(object)) return;
     InfinityLayer.addObject(object);
-    engine._canvasController.addObject(object.layer.zIndex, object);
 
     if (object is InfinityLoop) {
       final loop = object as InfinityLoop;
@@ -126,7 +131,6 @@ class InfinityEngine {
     final engine = InfinityEngine();
     if (!engine._container.removeObject(object)) return;
     InfinityLayer.removeObject(object);
-    engine._canvasController.removeObject(object.layer.zIndex, object);
   }
 
   static InfinityObject? getObjectByName(String name) {
@@ -145,8 +149,6 @@ class InfinityEngine {
 
     if (engine._container.containsObject(object)) {
       InfinityLayer.moveObject(object, targetLayer);
-      engine._canvasController.removeObject(currentLayer.zIndex, object);
-      engine._canvasController.addObject(targetLayer.zIndex, object);
     } else {
       object.state.layer = targetLayer;
     }

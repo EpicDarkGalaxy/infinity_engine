@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
+## [0.0.3] - 2026-11-17
+
+### Added
+- Hierarchical layers with automatic z-index assignment, sibling index validation, and scoped z-index lookup.
+- Configurable suppression for info, warning, and error logs through `InfinityEngine`.
+- Rigid-body force, impulse, acceleration, gravity scaling, drag, and manual-update controls.
+
+### Changed
+- Canvas contents are now derived from the visible layer hierarchy and update when scene or layer state changes.
+- Object visual state updates are batched until refreshed, while visibility and layer changes notify listeners immediately.
+- Collision handling respects layer collidability and exposes collision events to callbacks.
+- Updated README usage and installation guidance.
+
+### Fixed
+- Prevented duplicate z-indices among root layers or sibling sublayers, avoiding ambiguous render order.
+- Ensured sublayer objects are registered, located, removed, and rendered through recursive layer traversal.
+
 ## [0.0.2] - 2026-11-17
 
 ### Added

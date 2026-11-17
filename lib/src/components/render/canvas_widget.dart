@@ -1,38 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:infinity_engine/src/components/infinity_layer.dart';
 import 'package:infinity_engine/src/components/infinity_math/vector2.dart';
 
 /// 1. Controller to manage canvas objects reactively
 class CanvasController extends ChangeNotifier {
-  final Map<int, List<Widget>> _objects =
-      {}; // z-indexed objects for rendering order
-  List<Widget>? _orderedObjects;
   Size _canvasSize = Size.zero;
 
+  CanvasController() {
+    InfinityLayer.sceneChanges.addListener(_onSceneChanged);
+  }
+
   List<Widget> get objects {
-    final cachedObjects = _orderedObjects;
-    if (cachedObjects != null) return cachedObjects;
-
-    final zIndices = _objects.keys.toList()..sort();
-    _orderedObjects = List.unmodifiable(
-      zIndices.expand((zIndex) => _objects[zIndex]!),
-    );
-    return _orderedObjects!;
+    final List<Widget> objects = [];
+    for (var layer in InfinityLayer.visibleLayers) {
+      objects.addAll(layer.objects);
+    }
+    return objects;
   }
 
-  void addObject(int zIndex, Widget object) {
-    final layerObjects = _objects.putIfAbsent(zIndex, () => []);
-    if (layerObjects.contains(object)) return;
-    layerObjects.add(object);
-    _orderedObjects = null;
-    notifyListeners();
-  }
+  void _onSceneChanged() => notifyListeners();
 
-  void removeObject(int zIndex, Widget object) {
-    final layerObjects = _objects[zIndex];
-    if (layerObjects == null || !layerObjects.remove(object)) return;
-    if (layerObjects.isEmpty) _objects.remove(zIndex);
-    _orderedObjects = null;
-    notifyListeners();
+  @override
+  void dispose() {
+    InfinityLayer.sceneChanges.removeListener(_onSceneChanged);
+    super.dispose();
   }
 
   void setCanvasSize(Size size) {
@@ -54,12 +45,17 @@ class CanvasWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        controller.setCanvasSize(constraints.biggest);
-        return ListenableBuilder(
-          listenable: controller,
-          builder: (context, child) => Stack(children: controller.objects),
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, widget) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            controller.setCanvasSize(constraints.biggest);
+            return ListenableBuilder(
+              listenable: controller,
+              builder: (context, child) => Stack(children: controller.objects),
+            );
+          },
         );
       },
     );

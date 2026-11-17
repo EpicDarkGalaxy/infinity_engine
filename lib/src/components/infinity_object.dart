@@ -37,8 +37,17 @@ class InfinityObjectState extends ChangeNotifier {
   double previousRotation = 0.0;
   double currentRotation = 0.0;
 
+  /// Creates a new [InfinityObjectState] with the given parameters.
+  /// ## Parameters
+  /// - [id] is a unique identifier for the object.
+  /// - [position] is the initial position of the object.
+  /// - [size] is the initial size of the object.
+  /// - [rotation] is the initial rotation of the object.
+  /// - [color] is the initial color of the object.
+  /// - [layer] is the initial layer of the object (defaults to the default layer).
   InfinityObjectState({
-    this.id = " f",
+    this.id =
+        "100", // Currently not used, but can be used for future features like object serialization or identification
     Vector2 position = Vector2.zero,
     Vector2 size = const Vector2(100, 100),
     double rotation = 0.0,
@@ -123,9 +132,8 @@ class InfinityObjectState extends ChangeNotifier {
 }
 
 /// A widget that represents an object game object in the engine.
-/// ### Parameters
-/// * [state] - The state of the object, if not provided, a new state will be created.
-/// * [loops] - The loops that are attached to this object (or scripts that extends [InfinityLoop]).
+/// ## Note:
+/// InfinityObject is a [StatelessWidget] that listens to the [InfinityObjectState] and rebuilds itself when the state changes. It is not meant to be modified directly, but rather through the state object.
 class InfinityObject extends StatelessWidget {
   /// A widget that represents an object game object in the engine.
   /// ### Parameters
@@ -144,14 +152,19 @@ class InfinityObject extends StatelessWidget {
   }
 
   late final InfinityObjectState state;
-  final List<InfinityLoop> _loops = []; // Engine calls these loops every frame
+  // Loops: They are scripts that are attached to this object and are called every frame by the engine.
+  // They can be used to update the object's state, position, size, etc.
+  // Loops are not meant to be modified directly, InfinityObject.addLoop
+  final List<InfinityLoop> _loops = [];
   final List<InfinityComponent> _components =
       []; // Components that are attached to this object (eg. Collision, RigidBody)
 
   // Add Loop to object
   void addLoop(InfinityLoop loop) {
     _loops.add(loop);
-    InfinityEngine.addStartCallback(loop.start); // Register start callback
+    // Register start callback that will be called when the engine starts,
+    // or if the engine is already running, called immediately.
+    InfinityEngine.addStartCallback(loop.start);
   }
 
   void removeLoop(InfinityLoop loop) {
@@ -230,9 +243,11 @@ class InfinityObject extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: state,
+      listenable: Listenable.merge([state, layer]),
       builder: (context, child) {
-        if (!state.visibility) return const SizedBox.shrink();
+        if (!state.visibility || !layer.isVisible) {
+          return const SizedBox.shrink();
+        }
         return Transform.translate(
           offset: state.position.toOffset,
           child: Transform.rotate(

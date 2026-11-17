@@ -28,41 +28,147 @@ void main() {
   });
 
   group('CanvasController', () {
-    test('reuses ordered objects until the canvas changes', () {
-      final controller = CanvasController();
-      final background = Container();
-      controller.addObject(0, background);
-      final firstSnapshot = controller.objects;
+    test('auto-assigns indices and rejects duplicate sibling indices', () {
+      final explicitLayer = InfinityLayer.createLayer(
+        name: 'Canvas Explicit Index Layer',
+        zIndex: -20,
+      );
+      final automaticLayer = InfinityLayer.createLayer(
+        name: 'Canvas Automatic Index Layer',
+      );
+      final parentLayer = InfinityLayer.createLayer(
+        name: 'Canvas Index Parent Layer',
+        zIndex: -19,
+      );
+      final explicitSubLayer = InfinityLayer.createSubLayer(
+        parent: parentLayer,
+        name: 'Canvas Explicit Sublayer',
+        zIndex: -20,
+      );
+      final automaticSubLayer = InfinityLayer.createSubLayer(
+        parent: parentLayer,
+        name: 'Canvas Automatic Sublayer',
+      );
+      addTearDown(() {
+        InfinityLayer.removeSubLayer(parentLayer, explicitSubLayer);
+        InfinityLayer.removeSubLayer(parentLayer, automaticSubLayer);
+        InfinityLayer.removeLayer(explicitLayer);
+        InfinityLayer.removeLayer(automaticLayer);
+        InfinityLayer.removeLayer(parentLayer);
+      });
 
-      expect(identical(firstSnapshot, controller.objects), isTrue);
-
-      controller.addObject(1, Container());
-
-      expect(identical(firstSnapshot, controller.objects), isFalse);
+      expect(
+        automaticLayer.zIndex,
+        InfinityLayer.layers
+                .where((layer) => !identical(layer, automaticLayer))
+                .map((layer) => layer.zIndex)
+                .reduce((first, second) => first > second ? first : second) +
+            1,
+      );
+      expect(automaticSubLayer.zIndex, explicitSubLayer.zIndex + 1);
+      expect(InfinityLayer.getLayerByZIndex(-20), same(explicitLayer));
+      expect(
+        InfinityLayer.getLayerByZIndex(-20, parent: parentLayer),
+        same(explicitSubLayer),
+      );
+      expect(
+        () => InfinityLayer.createLayer(
+          name: 'Canvas Duplicate Index Layer',
+          zIndex: explicitLayer.zIndex,
+        ),
+        throwsStateError,
+      );
+      expect(
+        () => InfinityLayer.createSubLayer(
+          parent: parentLayer,
+          name: 'Canvas Duplicate Sublayer Index',
+          zIndex: explicitSubLayer.zIndex,
+        ),
+        throwsStateError,
+      );
     });
 
-    test(
-      'orders layers by z-index and preserves insertion order within layers',
-      () {
-        final controller = CanvasController();
-        final foregroundFirst = Container();
-        final background = Container();
-        final foregroundSecond = Container();
-        final behindBackground = Container();
+    test('registers objects assigned to sublayers', () {
+      final controller = CanvasController();
+      final parentLayer = InfinityLayer(
+        name: 'Canvas Sublayer Parent',
+        zIndex: -8,
+      );
+      final subLayer = InfinityLayer(name: 'Canvas Sublayer Child', zIndex: 1);
+      InfinityLayer.addLayer(parentLayer);
+      InfinityLayer.addSubLayer(parentLayer, subLayer);
 
-        controller.addObject(10, foregroundFirst);
-        controller.addObject(0, background);
-        controller.addObject(10, foregroundSecond);
-        controller.addObject(-1, behindBackground);
+      final parentObject = InfinityObject(
+        state: InfinityObjectState(layer: parentLayer),
+      );
+      final subLayerObject = InfinityObject(
+        state: InfinityObjectState(layer: subLayer),
+      );
+      InfinityLayer.addObject(parentObject);
+      InfinityLayer.addObject(subLayerObject);
 
-        expect(controller.objects, [
-          behindBackground,
-          background,
-          foregroundFirst,
-          foregroundSecond,
-        ]);
-      },
-    );
+      addTearDown(() {
+        controller.dispose();
+        InfinityLayer.removeObject(parentObject);
+        InfinityLayer.removeObject(subLayerObject);
+        InfinityLayer.removeSubLayer(parentLayer, subLayer);
+        InfinityLayer.removeLayer(parentLayer);
+      });
+
+      expect(InfinityLayer.getLayerByObject(subLayerObject), same(subLayer));
+      expect(
+        controller.objects.where(
+          (object) =>
+              identical(object, parentObject) ||
+              identical(object, subLayerObject),
+        ),
+        [parentObject, subLayerObject],
+      );
+    });
+
+    test('orders layers by z-index and objects by insertion order', () {
+      final controller = CanvasController();
+      final lowerLayer = InfinityLayer(
+        name: 'Canvas Order Lower Layer',
+        zIndex: -10,
+      );
+      final upperLayer = InfinityLayer(
+        name: 'Canvas Order Upper Layer',
+        zIndex: -9,
+      );
+      InfinityLayer.addLayer(upperLayer);
+      InfinityLayer.addLayer(lowerLayer);
+
+      final lowerFirst = InfinityObject(
+        state: InfinityObjectState(layer: lowerLayer),
+      );
+      final lowerSecond = InfinityObject(
+        state: InfinityObjectState(layer: lowerLayer),
+      );
+      final upperObject = InfinityObject(
+        state: InfinityObjectState(layer: upperLayer),
+      );
+      final testObjects = [lowerFirst, lowerSecond, upperObject];
+
+      InfinityLayer.addObject(lowerFirst);
+      InfinityLayer.addObject(lowerSecond);
+      InfinityLayer.addObject(upperObject);
+
+      addTearDown(() {
+        controller.dispose();
+        for (final object in testObjects) {
+          InfinityLayer.removeObject(object);
+        }
+        InfinityLayer.removeLayer(lowerLayer);
+        InfinityLayer.removeLayer(upperLayer);
+      });
+
+      final actualTestObjects = controller.objects
+          .where((object) => testObjects.contains(object))
+          .toList();
+
+      expect(actualTestObjects, [lowerFirst, lowerSecond, upperObject]);
+    });
   });
 
   testWidgets('reports the canvas logical size from its layout constraints', (
@@ -87,17 +193,24 @@ void main() {
     expect(canvasSize.y, 240);
   });
 
-  group('CanvasController removal', () {
-    test('removes objects from the specified layer', () {
+  group('CanvasController layer changes', () {
+    test('stops returning objects after they are removed from a layer', () {
       final controller = CanvasController();
-      final object = Container();
-      final otherObject = Container();
-      controller.addObject(0, object);
-      controller.addObject(1, otherObject);
+      final layer = InfinityLayer(name: 'Canvas Removal Test Layer', zIndex: 2);
+      InfinityLayer.addLayer(layer);
+      final object = InfinityObject(state: InfinityObjectState(layer: layer));
+      InfinityLayer.addObject(object);
+      addTearDown(() {
+        controller.dispose();
+        InfinityLayer.removeObject(object);
+        InfinityLayer.removeLayer(layer);
+      });
 
-      controller.removeObject(0, object);
+      expect(controller.objects, contains(object));
 
-      expect(controller.objects, [otherObject]);
+      InfinityLayer.removeObject(object);
+
+      expect(controller.objects, isNot(contains(object)));
     });
   });
 }

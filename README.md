@@ -26,7 +26,7 @@ Or add it directly to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  infinity_engine: ^0.0.2
+  infinity_engine: ^0.0.3
 ```
 
 Then fetch dependencies:
@@ -129,6 +129,10 @@ Objects can be assigned to layers with different z-indices:
 final background = InfinityLayer(name: 'Background', zIndex: 0);
 final foreground = InfinityLayer(name: 'Foreground', zIndex: 10);
 
+// Must be added before they can be used.
+InfinityLayer.addLayer(background);
+InfinityLayer.addLayer(foreground);
+
 final ship = InfinityObject(
   state: InfinityObjectState(
     name: 'ship',
@@ -149,7 +153,9 @@ final body = InfinityObject(
 );
 
 body.addComponent(RigidBody(object: body));
-body.addComponent(AABBCollider(object: body));
+body.addComponent(AABBCollider(object: body, onCollision(other) {
+  print(other.object.name)
+}));
 ```
 
 `RigidBody` and `AABBCollider` are intended for collision and motion integration, while custom game logic can be attached by extending `InfinityLoop` or adding additional components.

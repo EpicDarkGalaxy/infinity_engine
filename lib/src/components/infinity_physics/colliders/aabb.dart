@@ -1,7 +1,10 @@
 import 'package:infinity_engine/src/components/infinity_physics/colliders/base_collider.dart';
 import 'package:infinity_engine/src/components/infinity_physics/resolvers/aabb_collision_resolver.dart';
 
+/// AABB Collider is a rectangular collider that can be used for collision detection
 class AABBCollider extends BaseCollider {
+  /// Creates a new [AABBCollider] with the given parameters.
+  /// ## Parameters
   /// - [object] is the parent object of this collider
   /// - [size] is the size of the collider, if null, it will be the same as the parent object
   /// - [onCollision] is the function that will be called when the collider collides with another collider

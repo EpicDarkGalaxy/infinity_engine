@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:infinity_engine/src/components/infinity_layer.dart';
 import 'package:infinity_engine/src/components/infinity_math/vector2.dart';
 import 'package:infinity_engine/src/components/infinity_object.dart';
 import 'package:infinity_engine/src/components/infinity_physics/colliders/aabb.dart';
@@ -7,6 +8,24 @@ import 'package:infinity_engine/src/components/infinity_physics/rigidbody.dart';
 
 void main() {
   group('AABBCollisionResolver', () {
+    test('layer collidability controls collider eligibility', () {
+      final layer = InfinityLayer(
+        name: 'Collision Flag Test Layer',
+        zIndex: 1,
+        isCollidable: false,
+      );
+      final objectA = _objectAt(0, 0)..state.layer = layer;
+      final objectB = _objectAt(8, 0);
+      final colliderA = AABBCollider(object: objectA);
+      final colliderB = AABBCollider(object: objectB);
+
+      expect(colliderA.canCollide(colliderB), isFalse);
+
+      layer.isCollidable = true;
+
+      expect(colliderA.canCollide(colliderB), isTrue);
+    });
+
     test('does nothing when neither object has a rigid body', () {
       final objectA = _objectAt(0, 0);
       final objectB = _objectAt(8, 0);

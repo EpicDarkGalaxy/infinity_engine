@@ -3,16 +3,16 @@ import 'package:infinity_engine/src/components/infinity_object.dart';
 import 'package:infinity_engine/src/components/infinity_component.dart';
 
 /// A RigidBody component that can be attached to an InfinityObject to enable physics simulation.
-/// This component handles forces, acceleration, velocity, and position updates based on the physics simulation.
-/// ## Parameters
-/// - [object] is the parent InfinityObject to which this RigidBody is attached.
-/// - [mass] is the mass of the object. A mass of 0 or if [isStatic] is true will make the object immovable.
-/// - [drag] is the drag coefficient that slows down the object over time.
-/// - [isStatic] determines if the object is static (immovable) or dynamic (movable).
-/// - [manualTrigger] if true, the physics simulation will not automatically update the object's position and velocity; you must call [applyForce] manually.
-/// - [useGravity] if true, the object will be affected by gravity.
-/// - [gravityScale] is the scale factor for gravity.
 class RigidBody extends InfinityComponent {
+  /// Creates a new [RigidBody] with the given parameters.
+  /// ## Parameters
+  /// - [object] is the parent InfinityObject to which this RigidBody is attached.
+  /// - [mass] is the mass of the object. A mass of 0 or if [isStatic] is true will make the object immovable.
+  /// - [drag] is the drag coefficient that slows down the object over time.
+  /// - [isStatic] determines if the object is static (immovable) or dynamic (movable).
+  /// - [manualTrigger] if true, the physics simulation will not automatically update the object's position and velocity; you must call [applyForce] manually.
+  /// - [useGravity] if true, the object will be affected by gravity.
+  /// - [gravityScale] is the scale factor for gravity.
   RigidBody({
     required this.object,
     this.mass = 1.0,
