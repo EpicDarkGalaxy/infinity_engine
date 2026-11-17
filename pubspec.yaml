@@ -1,6 +1,6 @@
 name: infinity_engine
 description: Experimental 2D game engine for Flutter with layered objects, loops, physics, and particles.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/EpicDarkGalaxy/infinity_engine
 repository: https://github.com/EpicDarkGalaxy/infinity_engine
 issue_tracker: https://github.com/EpicDarkGalaxy/infinity_engine/issues

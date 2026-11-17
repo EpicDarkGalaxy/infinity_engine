@@ -26,7 +26,7 @@ Or add it directly to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  infinity_engine: ^0.0.1
+  infinity_engine: ^0.0.2
 ```
 
 Then fetch dependencies:
