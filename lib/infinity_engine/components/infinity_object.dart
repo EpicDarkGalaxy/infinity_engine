@@ -6,6 +6,9 @@ import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 import 'package:collection/collection.dart';
 
+/// A class that holds the state of an [InfinityObject].
+/// This class is used to track the state of an [InfinityObject] and to notify
+/// the [InfinityEngine] when the state of an [InfinityObject] changes.
 class InfinityObjectState extends ChangeNotifier {
   final String id;
   final BoxShape _shape;
@@ -114,11 +117,20 @@ class InfinityObjectState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Check if two vectors are the same, used to check if the position or size has changed to avoid unnecessary updates
   bool _sameVector(Vector2 first, Vector2 second) =>
       first.x == second.x && first.y == second.y;
 }
 
+/// A widget that represents an object game object in the engine.
+/// ### Parameters
+/// * [state] - The state of the object, if not provided, a new state will be created.
+/// * [loops] - The loops that are attached to this object (or scripts that extends [InfinityLoop]).
 class InfinityObject extends StatelessWidget {
+  /// A widget that represents an object game object in the engine.
+  /// ### Parameters
+  /// * [state] - The state of the object, if not provided, a new state will be created.
+  /// * [loops] - The loops that are attached to this object (or scripts that extends [InfinityLoop]).
   InfinityObject({
     super.key,
     InfinityObjectState? state,
@@ -132,14 +144,13 @@ class InfinityObject extends StatelessWidget {
   }
 
   late final InfinityObjectState state;
-  final List<InfinityLoop> _loops =
-      []; // Scripts that are attached to this object
+  final List<InfinityLoop> _loops = []; // Engine calls these loops every frame
   final List<InfinityComponent> _components = []; // Components that are attached to this object (eg. Collision, RigidBody)
 
   // Add Loop to object
   void addLoop(InfinityLoop loop) {
     _loops.add(loop);
-    InfinityEngine.addStartCallback(loop.start);
+    InfinityEngine.addStartCallback(loop.start); // Register start callback
   }
 
   void removeLoop(InfinityLoop loop) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' as flutter;
 import 'package:infinity_engine/infinity_engine/components.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_log.dart';
 import 'package:infinity_engine/infinity_engine/components/render/canvas_widget.dart';
 import 'package:infinity_engine/infinity_engine/components/render/collider_debug_painter.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_input/input_listener.dart';
@@ -29,12 +30,19 @@ class InfinityEngine {
   List<InfinityObject> get objects => _container.objects;
 
   bool isRunning = false;
+  bool isPaused = false;
+
+  /// Prevents the engine from updating the game state
+  void pause() => isPaused = true;
+
+  /// Resumes the engine to update the game state
+  void resume() => isPaused = false;
 
   void init() {
     _canvasController = CanvasController();
 
     _canvasWidget = CanvasWidget(controller: _canvasController);
-    flutter.debugPrint("InfinityEngine Initialized");
+    InfinityLog.i("InfinityEngine Initialized");
   }
 
   static void addStartCallback(void Function() callback) {
@@ -43,7 +51,7 @@ class InfinityEngine {
 
   /// Called every frame by the InfinityTick
   void _loop(double deltaTime) {
-    if (!isRunning) return;
+    if (!isRunning || isPaused) return;
 
     if (_startCallbacks.isNotEmpty) {
       for (var callback in List.unmodifiable(_startCallbacks)) {
@@ -55,7 +63,7 @@ class InfinityEngine {
     // Run individual update callbacks (scripts)
     final List<InfinityLoop> loops = _container.loops;
     if (loops.isEmpty) {
-      flutter.debugPrint("No loops to update");
+      InfinityLog.i("No loops to update");
     } else {
       for (var loop in loops) {
         loop.update(deltaTime);
@@ -107,7 +115,7 @@ class InfinityEngine {
       }
     }
 
-    flutter.debugPrint('Added object "${object.state.name}"');
+    InfinityLog.i('Added object "${object.state.name}"');
   }
 
   static void removeObject(InfinityObject object) {
@@ -138,6 +146,17 @@ class InfinityEngine {
     } else {
       object.state.layer = targetLayer;
     }
+  }
+
+  bool isObjectInViewport(InfinityObject object) {
+    final screenSize = _canvasController.getCanvasSize().toSize;
+    final objPos = object.position;
+    final objSize = object.size.toSize;
+    final bool withinX =
+        objPos.x + objSize.width >= 0 && objPos.x <= screenSize.width;
+    final bool withinY =
+        objPos.y + objSize.height >= 0 && objPos.y <= screenSize.height;
+    return withinX && withinY;
   }
 
   void startEngine() {

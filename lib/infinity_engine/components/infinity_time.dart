@@ -1,5 +1,6 @@
 import 'package:infinity_engine/infinity_engine/components/infinity_loop.dart';
 
+/// A component that provides the delta time between frames.
 class InfinityTime with InfinityLoop {
   static double get deltaTime => _deltaTime;
   static double _deltaTime = 0.0;

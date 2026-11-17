@@ -8,6 +8,7 @@ import 'package:infinity_engine/infinity_engine/components/infinity_object.dart'
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 /// Emits a one-shot radial burst of short-lived colored particles.
+/// - Compelety Written BY GitHub Copilot
 class ParticleSystem with InfinityLoop {
   ParticleSystem._({
     required Vector2 position,

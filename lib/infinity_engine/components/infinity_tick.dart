@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:infinity_engine/infinity_engine/components/infinity_log.dart';
 import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
 
 class InfinityTick extends StatefulWidget {
@@ -39,7 +40,7 @@ class _InfinityTickState extends State<InfinityTick>
   @override
   void initState() {
     super.initState();
-    debugPrint("InfinityTick initState");
+    InfinityLog.i("InfinityTick initState");
     _targetMicrosecondsPerFrame = (1000000 / widget.targetFps).round();
     _targetRenderMicrosecondsPerFrame = (1000000 / widget.renderFps).round();
 

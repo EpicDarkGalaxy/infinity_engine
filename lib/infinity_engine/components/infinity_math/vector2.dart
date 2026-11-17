@@ -41,6 +41,8 @@ class Vector2 {
 
   double distanceTo(Vector2 other) => (this - other).magnitude;
 
+  Vector2 directionTo(Vector2 other) => (other - this).normalized;
+
   double dot(Vector2 other) => x * other.x + y * other.y;
 
   double cross(Vector2 other) => x * other.y - y * other.x;

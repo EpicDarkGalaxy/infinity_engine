@@ -31,7 +31,7 @@ class Singularity extends flutter.StatelessWidget {
                           ),
                         ),
                       )
-                    : flutter.SizedBox.shrink(),
+                    : const flutter.SizedBox.shrink(),
               ],
             ),
           ),
@@ -52,7 +52,7 @@ void runApp(Singularity gameWidget) {
 }
 
 // I could have simply use the InfinityLoop but i wanted a seprate loop for the first or rootLoop
-/// First Loop of the game
+/// First Loop of the engine
 class SingularityLoop with InfinityLoop {
   @override
   void update(dt) {}

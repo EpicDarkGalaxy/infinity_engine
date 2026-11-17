@@ -11,6 +11,7 @@ import 'package:infinity_engine/infinity_engine/components/infinity_component.da
 /// - [isStatic] determines if the object is static (immovable) or dynamic (movable).
 /// - [manualTrigger] if true, the physics simulation will not automatically update the object's position and velocity; you must call [applyForce] manually.
 /// - [useGravity] if true, the object will be affected by gravity.
+/// - [gravityScale] is the scale factor for gravity.
 class RigidBody extends InfinityComponent {
   RigidBody({
     required this.object,
@@ -41,16 +42,18 @@ class RigidBody extends InfinityComponent {
   Vector2 get accumulatedForce => _forceAccumulator;
 
   /// Adds a force to the rigid body.
+  /// Forces are accumulated and applied in the next physics update.
   void addForce(Vector2 force) {
     _forceAccumulator = _forceAccumulator + force;
   }
 
-  /// Applies an impulse to the rigid body.
+  /// Applies an impulse (or instantaneous force) to the rigid body.
   void addImpulse(Vector2 impulse) {
     velocity = velocity + impulse * invMass;
   }
 
   /// Applies an acceleration to the rigid body.
+  /// Acceleration is applied immediately and does not accumulate.
   void applyAcceleration(Vector2 acceleration) {
     velocity = velocity + acceleration;
     velocity = velocity * (1.0 - (drag * invMass));
