@@ -1,8 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:infinity_engine/infinity_engine/components.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_component.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
 import 'package:infinity_engine/infinity_engine/components/infinity_physics/colliders/on_collision_callback.dart';
 
 abstract class BaseCollider extends InfinityComponent {

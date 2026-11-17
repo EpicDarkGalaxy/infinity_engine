@@ -1,14 +1,21 @@
 name: infinity_engine
-description: Experimental 2D game engine built with Flutter and Dart.
+description: Experimental 2D game engine for Flutter with layered objects, loops, physics, and particles.
 version: 0.0.1
 homepage: https://github.com/EpicDarkGalaxy/infinity_engine
 repository: https://github.com/EpicDarkGalaxy/infinity_engine
+issue_tracker: https://github.com/EpicDarkGalaxy/infinity_engine/issues
+topics:
+  - game
+  - flutter
+  - engine
+  - graphics
 
 environment:
   sdk: '>=3.12.0 <4.0.0'
   flutter: '>=3.12.0'
 
 dependencies:
+  collection: ^1.18.0
   flutter:
     sdk: flutter
 

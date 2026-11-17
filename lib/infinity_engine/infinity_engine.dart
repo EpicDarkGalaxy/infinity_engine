@@ -160,9 +160,15 @@ class InfinityEngine {
   }
 
   void startEngine() {
+    if (isRunning) return;
+
     isRunning = true;
-    // for (var call in _startCallbacks) {
-    //   call.call();
-    // }
+
+    if (_startCallbacks.isNotEmpty) {
+      for (var callback in List.unmodifiable(_startCallbacks)) {
+        callback();
+      }
+      _startCallbacks.clear();
+    }
   }
 }
