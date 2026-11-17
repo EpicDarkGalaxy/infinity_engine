@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:infinity_engine/infinity_engine/components.dart';
-import 'package:infinity_engine/infinity_engine/infinity_engine.dart';
+import 'package:infinity_engine/src/components.dart';
+import 'package:infinity_engine/src/infinity_engine.dart';
 
 void main() {
   test('emits particles and removes the burst after its lifetime', () {

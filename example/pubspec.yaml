@@ -1,0 +1,17 @@
+name: infinity_engine_example
+description: Example app for the Infinity Engine package.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.12.0 <4.0.0'
+  flutter: '>=3.12.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  infinity_engine:
+    path: ..
+
+flutter:
+  uses-material-design: true

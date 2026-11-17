@@ -35,40 +35,67 @@ Then fetch dependencies:
 flutter pub get
 ```
 
+## Example
+
+From the package root, run the included moving-square example:
+
+```bash
+flutter run -t example/lib/main.dart
+```
+
 ## Basic usage
 
 ```dart
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:infinity_engine/infinity_engine.dart';
 
 void main() {
+  InfinityEngine().init();
   runApp(Singularity(rootLoop: GameLoop()));
 }
 
-class GameLoop with InfinityLoop {
+class GameLoop extends SingularityLoop {
+  late final InfinityObject player;
+
   @override
   void start() {
-    final player = InfinityObject(
+    player = InfinityObject(
       state: InfinityObjectState(
         name: 'player',
-        position: const Vector2(120, 120),
-        size: const Vector2(32, 32),
-        color: Colors.blue,
+        position: const Vector2(32, 96),
+        size: const Vector2(48, 48),
+        color: Colors.cyan,
       ),
     );
-
-    player.addComponent(RigidBody());
-    player.addComponent(AABBCollider());
 
     InfinityEngine.addObject(player);
   }
 
   @override
   void update(double dt) {
-    // Update game logic here.
+    player.position = player.position + Vector2(60 * dt, 0);
   }
 }
 ```
+
+## Public imports
+
+Use the main library to import the complete public API:
+
+```dart
+import 'package:infinity_engine/infinity_engine.dart';
+```
+
+For smaller imports, use the focused libraries:
+
+```dart
+import 'package:infinity_engine/engine.dart';
+import 'package:infinity_engine/components.dart';
+import 'package:infinity_engine/physics.dart';
+import 'package:infinity_engine/input.dart';
+```
+
+These libraries are the supported public API. The implementation under `lib/src` is internal.
 
 ## Engine lifecycle
 
@@ -77,7 +104,6 @@ Use the singleton engine to register objects and manage runtime flow:
 ```dart
 final engine = InfinityEngine();
 engine.init();
-engine.startEngine();
 ```
 
 You can add objects directly:
@@ -145,7 +171,7 @@ InfinityEngine.addObject(burst);
 
 - The package is currently experimental and may not yet provide a complete polished API.
 - The project is oriented toward lightweight 2D game development in Flutter.
-- For the most up-to-date behavior, inspect the source under `lib/infinity_engine` and the test coverage in `test/`.
+- For implementation details, inspect `lib/src`; for usage and expected behavior, see the tests in `test/`.
 
 ## License
 

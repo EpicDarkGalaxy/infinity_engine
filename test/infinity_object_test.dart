@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_math/vector2.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_layer.dart';
-import 'package:infinity_engine/infinity_engine/components/infinity_object.dart';
+import 'package:infinity_engine/src/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/src/components/infinity_layer.dart';
+import 'package:infinity_engine/src/components/infinity_object.dart';
 
 void main() {
   test('batches visual state notifications until update', () {
@@ -43,22 +43,25 @@ void main() {
   });
 
   group('InfinityObject layer state', () {
-    test('initializes and changes layer through state without mutable widget fields', () {
-      final customLayer = InfinityLayer(name: 'Overlay', zIndex: 5);
-      InfinityLayer.addLayer(customLayer);
-      addTearDown(() => InfinityLayer.removeLayer(customLayer));
+    test(
+      'initializes and changes layer through state without mutable widget fields',
+      () {
+        final customLayer = InfinityLayer(name: 'Overlay', zIndex: 5);
+        InfinityLayer.addLayer(customLayer);
+        addTearDown(() => InfinityLayer.removeLayer(customLayer));
 
-      final state = InfinityObjectState(layer: customLayer);
-      final object = InfinityObject(state: state);
-      var notifications = 0;
-      state.addListener(() => notifications++);
+        final state = InfinityObjectState(layer: customLayer);
+        final object = InfinityObject(state: state);
+        var notifications = 0;
+        state.addListener(() => notifications++);
 
-      expect(object.layer, same(customLayer));
+        expect(object.layer, same(customLayer));
 
-      object.layer = InfinityLayer.defaultLayer;
+        object.layer = InfinityLayer.defaultLayer;
 
-      expect(object.layer, same(InfinityLayer.defaultLayer));
-      expect(notifications, 1);
-    });
+        expect(object.layer, same(InfinityLayer.defaultLayer));
+        expect(notifications, 1);
+      },
+    );
   });
 }

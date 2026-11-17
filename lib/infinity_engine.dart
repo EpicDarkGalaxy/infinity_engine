@@ -1,2 +1,4 @@
-export 'infinity_engine/components.dart';
-export 'infinity_engine/infinity_engine.dart';
+export 'components.dart';
+export 'engine.dart';
+export 'input.dart';
+export 'physics.dart';
