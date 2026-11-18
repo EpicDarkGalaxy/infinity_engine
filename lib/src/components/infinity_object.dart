@@ -11,10 +11,10 @@ import 'package:collection/collection.dart';
 /// the [InfinityEngine] when the state of an [InfinityObject] changes.
 class InfinityObjectState extends ChangeNotifier {
   final String id;
-  final BoxShape _shape;
 
   String name;
 
+  BoxShape _shape;
   InfinityLayer _layer;
 
   bool _hidden = false;
@@ -120,6 +120,12 @@ class InfinityObjectState extends ChangeNotifier {
     notifyListeners();
   }
 
+  set shape(BoxShape shape) {
+    if (shape != _shape) {
+      _shape = shape;
+    }
+  }
+
   void update() {
     if (!_hasPendingChanges) return;
     _hasPendingChanges = false;
@@ -173,6 +179,10 @@ class InfinityObject extends StatelessWidget {
 
   // Proxy setter and getters for convenience if accessing via object reference
   // Setters
+  set shape(BoxShape shape) {
+    state.shape = shape;
+  }
+
   set position(Vector2 newPosition) {
     state.position = newPosition;
   }
@@ -203,6 +213,7 @@ class InfinityObject extends StatelessWidget {
 
   // Getters
   String get name => state.name;
+  BoxShape get shape => state.shape;
   Vector2 get position => state.position;
   Vector2 get size => state.size;
   double get rotation => state.rotation;
