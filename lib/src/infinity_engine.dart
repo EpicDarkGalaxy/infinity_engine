@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as flutter;
 import 'package:infinity_engine/components.dart';
-import 'package:infinity_engine/src/components.dart';
 import 'package:infinity_engine/src/components/infinity_log.dart';
 import 'package:infinity_engine/src/components/render/canvas_widget.dart';
 import 'package:infinity_engine/src/components/render/collider_debug_painter.dart';

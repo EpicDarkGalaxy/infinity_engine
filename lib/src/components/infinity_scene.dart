@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:infinity_engine/components.dart';
 import 'package:infinity_engine/engine.dart';

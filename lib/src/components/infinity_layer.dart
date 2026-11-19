@@ -126,16 +126,6 @@ class InfinityLayer extends ChangeNotifier {
     _notifySceneChanged();
   }
 
-  int _nextZIndex(Iterable<InfinityLayer> siblings) {
-    int? maxZIndex;
-    for (final layer in siblings) {
-      if (maxZIndex == null || layer.zIndex > maxZIndex) {
-        maxZIndex = layer.zIndex;
-      }
-    }
-    return maxZIndex == null ? 0 : maxZIndex + 1;
-  }
-
   @internal
   void removeSubLayer(InfinityLayer layer, InfinityLayer subLayer) {
     if (layer._subLayers.remove(subLayer)) {

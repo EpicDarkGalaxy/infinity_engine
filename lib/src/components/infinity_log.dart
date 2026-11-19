@@ -1,40 +1,28 @@
 import 'package:flutter/foundation.dart';
 
 class InfinityLog {
-  static bool _suppressInfoLogs = false;
-  static bool _suppressDebugLogs = false;
-  static bool _suppressWarningLogs = false;
-  static bool _suppressErrorLogs = false;
-
-  static bool get suppressInfoLogs => _suppressInfoLogs;
-  static set suppressInfoLogs(bool value) => _suppressInfoLogs = value;
-
-  static bool get suppressDebugLogs => _suppressDebugLogs;
-  static set suppressDebugLogs(bool value) => _suppressDebugLogs = value;
-
-  static bool get suppressWarningLogs => _suppressWarningLogs;
-  static set suppressWarningLogs(bool value) => _suppressWarningLogs = value;
-
-  static bool get suppressErrorLogs => _suppressErrorLogs;
-  static set suppressErrorLogs(bool value) => _suppressErrorLogs = value;
+  static bool suppressInfoLogs = false;
+  static bool suppressDebugLogs = false;
+  static bool suppressWarningLogs = false;
+  static bool suppressErrorLogs = false;
 
   static void i(String message) {
-    if (_suppressInfoLogs) return;
+    if (suppressInfoLogs) return;
     _print(message, "Info");
   }
 
   static void d(String message) {
-    if (_suppressDebugLogs) return;
+    if (suppressDebugLogs) return;
     _print(message, "Debug");
   }
 
   static void w(String message) {
-    if (_suppressWarningLogs) return;
+    if (suppressWarningLogs) return;
     _print(message, "Warning");
   }
 
   static void e(String message) {
-    if (_suppressErrorLogs) return;
+    if (suppressErrorLogs) return;
     _print(message, "Error");
   }
 
