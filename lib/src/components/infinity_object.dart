@@ -208,7 +208,8 @@ class InfinityObject extends StatelessWidget {
   }
 
   set layer(InfinityLayer newLayer) {
-    InfinityEngine.setObjectLayer(this, newLayer);
+    state.layer = newLayer;
+    // InfinityEngine.setObjectLayer(this, newLayer);
   }
 
   // Getters

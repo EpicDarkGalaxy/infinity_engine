@@ -2,9 +2,9 @@ part of 'infinity_engine.dart';
 
 /// The main widget that runs the Infinity Engine. It sets up the game loop and renders the game canvas.
 class Singularity extends flutter.StatelessWidget {
-  const Singularity({super.key, required this.rootLoop});
+  const Singularity({super.key, required this.defaultScene});
 
-  final SingularityLoop rootLoop;
+  final SingularityLoop defaultScene;
 
   @override
   flutter.Widget build(flutter.BuildContext context) {
@@ -43,17 +43,18 @@ class Singularity extends flutter.StatelessWidget {
 }
 
 void runApp(Singularity gameWidget) {
+  InfinitySceneManager().addScene(gameWidget.defaultScene);
   final rootObject = InfinityObject(
     state: InfinityObjectState(name: "rootLoop", color: flutter.Colors.black),
-    loops: [gameWidget.rootLoop, InfinityTime()],
+    loops: [InfinityTime()],
   )..hide();
-  InfinityEngine.addObject(rootObject);
+  InfinitySceneManager().switchTo(gameWidget.defaultScene);
+  InfinityEngine.addObject(rootObject, addToScene: false);
   InfinityEngine().startEngine();
   flutter.runApp(gameWidget);
 }
 
-/// I could have simply use the InfinityLoop but i wanted a seprate loop for the first or rootLoop
-class SingularityLoop with InfinityLoop {
+class SingularityLoop extends InfinityScene with InfinityLoop {
   @override
   void update(dt) {}
 

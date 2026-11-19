@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_engine/src/components/infinity_layer.dart';
-import 'package:infinity_engine/src/components/infinity_math/vector2.dart';
+import 'package:infinity_engine/components.dart';
+import 'package:infinity_engine/src/components/infinity_log.dart';
 
 /// 1. Controller to manage canvas objects reactively
 class CanvasController extends ChangeNotifier {
   Size _canvasSize = Size.zero;
 
-  CanvasController() {
-    InfinityLayer.sceneChanges.addListener(_onSceneChanged);
-  }
-
   List<Widget> get objects {
     final List<Widget> objects = [];
-    for (var layer in InfinityLayer.visibleLayers) {
+    final scene = InfinitySceneManager().currentScene;
+    if (scene == null) return objects;
+
+    void addVisibleLayerObjects(InfinityLayer layer) {
+      if (!layer.isVisible) return;
       objects.addAll(layer.objects);
+      for (final subLayer in layer.subLayer) {
+        addVisibleLayerObjects(subLayer);
+      }
     }
+
+    for (final layer in scene.layers) {
+      addVisibleLayerObjects(layer);
+    }
+    InfinityLog.d('CanvasController SceneChanged: ${objects.length} objects');
     return objects;
-  }
-
-  void _onSceneChanged() => notifyListeners();
-
-  @override
-  void dispose() {
-    InfinityLayer.sceneChanges.removeListener(_onSceneChanged);
-    super.dispose();
   }
 
   void setCanvasSize(Size size) {
@@ -45,17 +45,38 @@ class CanvasWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sceneManager = InfinitySceneManager();
     return ListenableBuilder(
-      listenable: controller,
+      listenable: sceneManager,
       builder: (context, widget) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            controller.setCanvasSize(constraints.biggest);
-            return ListenableBuilder(
-              listenable: controller,
-              builder: (context, child) => Stack(children: controller.objects),
-            );
-          },
+        final scene = sceneManager.currentScene;
+        return ListenableBuilder(
+          listenable: scene ?? sceneManager,
+          builder: (context, child) => LayoutBuilder(
+            builder: (context, constraints) {
+              controller.setCanvasSize(constraints.biggest);
+              return Stack(
+                children: [
+                  for (final layer in scene?.layers ?? []) _buildLayer(layer),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLayer(InfinityLayer layer) {
+    return ListenableBuilder(
+      listenable: layer,
+      builder: (context, child) {
+        if (!layer.isVisible) return const SizedBox.shrink();
+        return Stack(
+          children: [
+            ...layer.objects,
+            for (final subLayer in layer.subLayer) _buildLayer(subLayer),
+          ],
         );
       },
     );

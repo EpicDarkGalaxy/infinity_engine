@@ -18,7 +18,7 @@ void main() {
     );
     InfinityEngine.addObject(object);
 
-    await tester.pumpWidget(Singularity(rootLoop: SingularityLoop()));
+    await tester.pumpWidget(Singularity(defaultScene: SingularityLoop()));
 
     expect(tester.getSize(find.byType(CanvasWidget)), isNot(Size.zero));
     expect(find.byKey(const ValueKey('scene-object')), findsOneWidget);

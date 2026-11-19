@@ -1,22 +1,23 @@
-import 'package:flutter/material.dart' show Colors;
+import 'package:flutter/material.dart' show BoxShape, Colors;
 import 'package:infinity_engine/infinity_engine.dart';
 
 void main() {
   InfinityEngine().init();
-  runApp(Singularity(rootLoop: ExampleLoop()));
+  runApp(Singularity(defaultScene: ExampleScene()));
 }
 
-class ExampleLoop extends SingularityLoop {
+class ExampleScene extends SingularityLoop {
   late final InfinityObject player;
 
   @override
-  void start() {
+  void onLoad() {
     player = InfinityObject(
       state: InfinityObjectState(
         name: 'player',
         position: const Vector2(32, 96),
         size: const Vector2(48, 48),
         color: Colors.cyan,
+        shape: BoxShape.circle,
       ),
     );
     InfinityEngine.addObject(player);

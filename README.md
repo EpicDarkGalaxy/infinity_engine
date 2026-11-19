@@ -7,8 +7,9 @@ This project is a small, game-oriented engine for creating scene-based experienc
 ## Features
 
 - Layered scene objects with z-order support
+- Scene lifecycle and scene switching through `InfinitySceneManager`
 - Game loop orchestration via `InfinityLoop`
-- Simple object model with transforms, visibility, color, and size
+- Simple object model with transforms, visibility, color, size, and shape
 - Physics primitives such as `RigidBody` and `AABBCollider`
 - Input handling via `InfinityInput`
 - Particle effects through `ParticleSystem`
@@ -51,20 +52,21 @@ import 'package:infinity_engine/infinity_engine.dart';
 
 void main() {
   InfinityEngine().init();
-  runApp(Singularity(rootLoop: GameLoop()));
+  runApp(Singularity(defaultScene: GameLoop()));
 }
 
 class GameLoop extends SingularityLoop {
   late final InfinityObject player;
 
   @override
-  void start() {
+  void onLoad() {
     player = InfinityObject(
       state: InfinityObjectState(
         name: 'player',
         position: const Vector2(32, 96),
         size: const Vector2(48, 48),
         color: Colors.cyan,
+        shape: BoxShape.circle,
       ),
     );
 
@@ -77,6 +79,8 @@ class GameLoop extends SingularityLoop {
   }
 }
 ```
+
+`SingularityLoop` is both a scene and a game loop. Override `onLoad` to create scene objects and `onUnload` to clean up resources.
 
 ## Public imports
 
@@ -121,6 +125,44 @@ final sprite = InfinityObject(
 InfinityEngine.addObject(sprite);
 ```
 
+## Scenes
+
+Scenes own their objects and layers. Create a scene loop for the default scene:
+
+```dart
+class MenuScene extends SingularityLoop {
+  @override
+  void onLoad() {
+    InfinityEngine.addObject(InfinityObject(
+      state: InfinityObjectState(
+        name: 'menu-title',
+        position: const Vector2(200, 100),
+        size: const Vector2(240, 64),
+        color: Colors.blue,
+      ),
+    ));
+  }
+}
+```
+
+Register additional scenes and switch between them through the scene manager:
+
+```dart
+final scenes = InfinitySceneManager();
+final menu = MenuScene();
+final game = GameScene();
+
+scenes.addScene(menu);
+scenes.addScene(game);
+scenes.switchTo(game);
+```
+
+By default, switching away purges the previous scene and calls `onLoad` again when it is activated later. Pass `keepPreviousAlive: true` to preserve its objects and state:
+
+```dart
+scenes.switchTo(game, keepPreviousAlive: true);
+```
+
 ## Layers
 
 Objects can be assigned to layers with different z-indices:
@@ -129,10 +171,6 @@ Objects can be assigned to layers with different z-indices:
 final background = InfinityLayer(name: 'Background', zIndex: 0);
 final foreground = InfinityLayer(name: 'Foreground', zIndex: 10);
 
-// Must be added before they can be used.
-InfinityLayer.addLayer(background);
-InfinityLayer.addLayer(foreground);
-
 final ship = InfinityObject(
   state: InfinityObjectState(
     name: 'ship',
@@ -140,8 +178,15 @@ final ship = InfinityObject(
   ),
 );
 
+final scene = InfinityScene(name: 'Game');
+scene.addLayer(background);
+scene.addLayer(foreground);
+scene.addObject(ship);
+
 ship.layer = background;
 ```
+
+Scene layers are separate from the package-wide `InfinityLayer.defaultLayer` and `InfinityLayer.uiLayer`. An object is looked up by layer name when it is added to a scene, so scene-specific layer instances should be used.
 
 ## Physics and components
 

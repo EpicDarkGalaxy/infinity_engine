@@ -4,18 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project adheres to Semantic Versioning.
 
-## [0.0.3] - 2026-11-17
+
+## [0.0.3] - 2026-11-19
 
 ### Added
 - Hierarchical layers with automatic z-index assignment, sibling index validation, and scoped z-index lookup.
 - Configurable suppression for info, warning, and error logs through `InfinityEngine`.
 - Rigid-body force, impulse, acceleration, gravity scaling, drag, and manual-update controls.
+- Scene lifecycle support with `InfinityScene`, including `onLoad`, `onUnload`, scene-local objects, and default game/UI layers.
+- `InfinitySceneManager` APIs for registering scenes and switching scenes with preserved or purged state.
+- `shape` support for `InfinityObjectState` and `InfinityObject`, including `BoxShape.rectangle` and `BoxShape.circle`.
+- Screen-aligned and world-positioned UI objects through `InfinityUi`.
 
 ### Changed
 - Canvas contents are now derived from the visible layer hierarchy and update when scene or layer state changes.
 - Object visual state updates are batched until refreshed, while visibility and layer changes notify listeners immediately.
 - Collision handling respects layer collidability and exposes collision events to callbacks.
 - Updated README usage and installation guidance.
+- The `Singularity` widget now accepts `defaultScene` and `runApp` activates the scene through `InfinitySceneManager`.
+- Canvas rendering is now scoped to the active scene and recursively follows visible layer and sublayer hierarchy.
+- Object visual updates use batched state refreshes, with visibility and layer changes notifying listeners immediately.
+- Updated package documentation and the runnable Flutter example for scene-based usage.
 
 ### Fixed
 - Prevented duplicate z-indices among root layers or sibling sublayers, avoiding ambiguous render order.

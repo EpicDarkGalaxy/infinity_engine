@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as flutter;
+import 'package:infinity_engine/components.dart';
 import 'package:infinity_engine/src/components.dart';
 import 'package:infinity_engine/src/components/infinity_log.dart';
 import 'package:infinity_engine/src/components/render/canvas_widget.dart';
@@ -23,6 +24,9 @@ class InfinityEngine {
   bool get suppressInfoLogs => InfinityLog.suppressInfoLogs;
   set suppressInfoLogs(bool value) => InfinityLog.suppressInfoLogs = value;
 
+  bool get suppressDebugLogs => InfinityLog.suppressDebugLogs;
+  set suppressDebugLogs(bool value) => InfinityLog.suppressDebugLogs = value;
+
   bool get suppressWarningLogs => InfinityLog.suppressWarningLogs;
   set suppressWarningLogs(bool value) =>
       InfinityLog.suppressWarningLogs = value;
@@ -33,7 +37,13 @@ class InfinityEngine {
   late final CanvasController _canvasController;
   late final CanvasWidget _canvasWidget;
 
+  @internal
+  CanvasWidget get canvasWidget => _canvasWidget;
+
   final List<void Function()> _startCallbacks = [];
+
+  final InfinitySceneManager _sceneManager = InfinitySceneManager();
+  InfinitySceneManager get sceneManager => _sceneManager;
 
   final InfinityContainer _container = InfinityContainer();
   List<InfinityObject> get objects => _container.objects;
@@ -71,13 +81,25 @@ class InfinityEngine {
     }
 
     // Run individual update callbacks (scripts)
-    final List<InfinityLoop> loops = _container.loops;
-    if (loops.isEmpty) {
+    final List<InfinityLoop> globalScopedLoops = _container.loops;
+    final currentScene = sceneManager.currentScene;
+    final List<InfinityLoop> sceneScopedLoops =
+        currentScene?.container.loops ?? [];
+    if (globalScopedLoops.isEmpty &&
+        sceneScopedLoops.isEmpty &&
+        currentScene is! InfinityLoop) {
       InfinityLog.i("No loops to update");
-    } else {
-      for (var loop in loops) {
-        loop.update(deltaTime);
-      }
+    }
+
+    for (var loop in globalScopedLoops) {
+      loop.update(deltaTime);
+    }
+
+    if (currentScene is InfinityLoop) {
+      (currentScene as InfinityLoop).update(deltaTime);
+    }
+    for (var loop in sceneScopedLoops) {
+      loop.update(deltaTime);
     }
 
     // Apply components
@@ -86,7 +108,10 @@ class InfinityEngine {
 
   /// Apply all component's effect to all objects
   void _applyComponents(double deltaTime) {
-    final objects = _container.objects;
+    final objects = [
+      ..._container.objects,
+      ...?_sceneManager.currentScene?.container.objects,
+    ];
     for (int i = 0; i < objects.length; i++) {
       var object = objects[i];
       for (var component in object.components) {
@@ -100,13 +125,20 @@ class InfinityEngine {
     }
   }
 
+  /// Update the active scene's state
+  @internal
+  void updateScene() {
+    final sceneObjects = _sceneManager.currentScene?.container.objects ?? [];
+    for (var object in sceneObjects) {
+      object.refresh();
+    }
+  }
+
   static Vector2 get screenSize => _instance._canvasController.getCanvasSize();
 
-  static void addObject(InfinityObject object) {
+  @internal
+  void handleStartCallback(InfinityObject object) {
     final engine = InfinityEngine();
-    if (!engine._container.addObject(object)) return;
-    InfinityLayer.addObject(object);
-
     if (object is InfinityLoop) {
       final loop = object as InfinityLoop;
       if (engine.isRunning) {
@@ -123,36 +155,122 @@ class InfinityEngine {
         engine._startCallbacks.add(loop.start);
       }
     }
+  }
 
+  /// Add an object to the engine
+  /// ## Parameters
+  /// - [object] The object to add
+  /// - [addToScene] Whether to add the object to the current scene, if false
+  ///   the object will be added to the engine's lifecycle
+  static void addObject(InfinityObject object, {bool addToScene = true}) {
+    if (addToScene) {
+      _addObjectToScene(object);
+      return;
+    }
+
+    _addObjectToEngine(object);
+    InfinityEngine().handleStartCallback(object);
     InfinityLog.i('Added object "${object.state.name}"');
   }
 
-  static void removeObject(InfinityObject object) {
+  static void _addObjectToEngine(InfinityObject object) {
+    final engine = InfinityEngine();
+    if (!engine._container.addObject(object)) return;
+  }
+
+  static void _addObjectToScene(InfinityObject object) {
+    final scene = _instance.sceneManager.currentScene;
+    if (scene == null) return;
+    scene.addObject(object);
+  }
+
+  static void _removeObjectFromEngine(InfinityObject object) {
     final engine = InfinityEngine();
     if (!engine._container.removeObject(object)) return;
-    InfinityLayer.removeObject(object);
+  }
+
+  static void _removeObjectFromScene(InfinityObject object) {
+    final scene = _instance.sceneManager.currentScene;
+    if (scene == null) return;
+    scene.removeObject(object);
+  }
+
+  /// Removes an object from the scene.
+  /// ## Parameters:
+  /// - `object`: The object to remove.
+  /// - `fromScene`: If provided, selects whether to remove from the scene or
+  ///   engine container. Otherwise, the object's current owner is detected.
+  static void removeObject(InfinityObject object, {bool? fromScene}) {
+    final currentScene = _instance.sceneManager.currentScene;
+    final shouldRemoveFromScene =
+        fromScene ?? (currentScene?.container.containsObject(object) ?? false);
+
+    if (shouldRemoveFromScene) {
+      _removeObjectFromScene(object);
+    } else {
+      _removeObjectFromEngine(object);
+    }
+    InfinityLog.d('Object removed: ${object.name}');
   }
 
   static InfinityObject? getObjectByName(String name) {
-    return InfinityEngine()._container.getObjectByName(name);
+    final object =
+        InfinityEngine()._container.getObjectByName(name) ??
+        _instance.sceneManager.currentScene?.container.getObjectByName(name);
+    if (object == null) {
+      InfinityLog.e('Object with name "$name" not found');
+      return null;
+    }
+    return object;
   }
 
-  static void setObjectLayer(InfinityObject object, InfinityLayer newLayer) {
-    final engine = InfinityEngine();
-    final targetLayer = InfinityLayer.getLayerByName(newLayer.name);
-    if (targetLayer == null) {
-      throw StateError("Layer ${newLayer.name} does not exist.");
+  static T? getObject<T extends InfinityObject>() {
+    final object =
+        InfinityEngine()._container.getObjectByType<T>() ??
+        _instance.sceneManager.currentScene?.container.getObjectByType<T>();
+    if (object == null) {
+      InfinityLog.e('Object with name "$T" not found');
+      return null;
     }
-
-    final currentLayer = object.layer;
-    if (identical(currentLayer, targetLayer)) return;
-
-    if (engine._container.containsObject(object)) {
-      InfinityLayer.moveObject(object, targetLayer);
-    } else {
-      object.state.layer = targetLayer;
-    }
+    return object;
   }
+
+  /// Adds a layer to the current scene.
+  static void addLayer(InfinityLayer layer) {
+    final scene = _instance.sceneManager.currentScene;
+    if (scene == null) return;
+    scene.addLayer(layer);
+  }
+
+  /// Removes a layer from the current scene.
+  static void removeLayer(InfinityLayer layer) {
+    final scene = _instance.sceneManager.currentScene;
+    if (scene == null) return;
+    scene.removeLayer(layer);
+  }
+
+  static InfinityLayer? getLayerByName(String name) {
+    final scene = _instance.sceneManager.currentScene;
+    if (scene == null) return null;
+    return scene.getLayerByName(name);
+  }
+
+  // static void setObjectLayer(InfinityObject object, InfinityLayer newLayer) {
+  //   final engine = InfinityEngine();
+  //   final targetLayer = InfinityLayer.getLayerByName(newLayer.name);
+  //   if (targetLayer == null) {
+  //     throw StateError("Layer ${newLayer.name} does not exist.");
+  //   }
+
+  //   final currentLayer = object.layer;
+  //   if (identical(currentLayer, targetLayer)) return;
+
+  //   if (engine._container.containsObject(object)) {
+  //     InfinityLayer.moveObject(object, targetLayer);
+  //   } else {
+  //     object.state.layer = targetLayer;
+  //   }
+  // }
 
   bool isObjectInViewport(InfinityObject object) {
     final screenSize = _canvasController.getCanvasSize().toSize;
@@ -165,6 +283,7 @@ class InfinityEngine {
     return withinX && withinY;
   }
 
+  @internal
   void startEngine() {
     if (isRunning) return;
 

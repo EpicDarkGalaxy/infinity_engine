@@ -7,3 +7,5 @@ export 'src/components/infinity_object.dart'
 export 'src/components/infinity_time.dart' show InfinityTime;
 export 'src/components/infinity_ui.dart' show InfinityUi;
 export 'src/components/particle_system.dart' show ParticleSystem;
+export 'src/components/infinity_scene.dart' show InfinityScene;
+export 'src/components/infinity_scene_manager.dart' show InfinitySceneManager;

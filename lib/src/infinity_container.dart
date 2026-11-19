@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:infinity_engine/src/components/infinity_loop.dart';
 import 'package:infinity_engine/src/components/infinity_object.dart';
 
@@ -32,6 +33,10 @@ class InfinityContainer {
       }
     }
     return null;
+  }
+
+  T? getObjectByType<T extends InfinityObject>() {
+    return objects.firstWhereOrNull((element) => element is T) as T?;
   }
 
   /// Removes the object from the container.
